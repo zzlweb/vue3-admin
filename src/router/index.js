@@ -1,4 +1,7 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
+import {
+  createRouter,
+  createWebHashHistory,
+} from 'vue-router'
 import Home from '@/views/Home/index.vue'
 import NotFound from '@/views/404/index.vue'
 import Layout from '@/layout/index.vue'
@@ -13,30 +16,45 @@ file.keys().forEach(key => {
   modules.push(file(key).default)
 })
 
-const routes = [
-  {
+const routes = [{
+    path: '/login',
+    name: 'login',
+    component: () => import( /* webpackChunkName: "login" */ '@/views/Login/index.vue')
+  }, {
     path: '/',
     component: Layout,
     redirect: '/Home',
     children: [{
-      path: 'Home',
-      name: '首页',
-      component: Home,
-      meta: { title: '首页' }
-    },
-    ...modules,
-    // {
+        path: 'Home',
+        name: '首页',
+        component: Home,
+        meta: {
+          title: '首页'
+        }
+      },
+      ...modules,
 
-    //   path: '/login',
-    //   name: 'login',
-    //   component: () => import(/* webpackChunkName: "login" */ '@/views/Login/index.vue')
-    // },
+      {
+        path: '/redirect',
+        component: Layout,
+        hidden: true,
+        children: [{
+          path: '/redirect/:path(.*)',
+          component: () => import('@/views/redirect/index')
+        }]
+      },
+      {
+        path: '/:pathMatch(.*)',
+        component: NotFound,
+        hidden: true
+      }
     ]
   },
   {
     path: '/:pathMatch(.*)',
     name: '404',
-    component: NotFound
+    component: NotFound,
+    hidden: true
   }
 ]
 

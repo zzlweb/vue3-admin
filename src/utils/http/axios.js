@@ -6,10 +6,10 @@ import router from '@/router'
 import { message } from 'ant-design-vue'
 import Store from '@/store'
 /**
- * get status code
+ * 根据状态码获取message
  * @param {AxiosResponse} response Axios  response object
  */
-const getErrorCode2text = (response: AxiosResponse): string => {
+const getErrorCode2text = (response) => {
   /** http status code */
   const code = response.code
   /** notice text */
@@ -69,22 +69,12 @@ const http = Axios.create({
  * @description 请求发起前的拦截器
  * @returns {AxiosRequestConfig} config
  */
-http.interceptors.request.use((config: AxiosRequestConfig) => {
-  // do something before request is sent
-
+http.interceptors.request.use((config) => {
   if (Store.user.getters.token) {
-    // let each request carry token
-    // ['X-Token'] is a custom headers key
-    // please modify it according to the actual situation
     config.headers['X-Token'] = getToken()
   }
   return config
 
-  error: any => {
-    // do something with request error
-    console.log(error) // for debug
-    return Promise.reject(error)
-  }
 })
 
 /**
@@ -92,19 +82,8 @@ http.interceptors.request.use((config: AxiosRequestConfig) => {
  * @returns {}
  */
 http.interceptors.response.use(
-  /**
-   * If you want to get http information such as headers or status
-   * Please return  response => response
-  */
-
-  /**
-   * Determine the request status by custom code
-   * Here is just an example
-   * You can also judge the status by HTTP Status Code
-   */
   response => {
     const res = response.data
-
     // 请求失败
     if (res.code !== 200) {
       message.info(res.message || 'Error', 2)

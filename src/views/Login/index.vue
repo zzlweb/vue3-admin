@@ -11,7 +11,7 @@
     >
       <a-form-item>
         <a-input
-          v-model:value="formInline.user"
+          v-model:value="formInline.username"
           placeholder="admin"
           autocomplete="new-password"
         >
@@ -24,18 +24,13 @@
         <a-input
           v-model:value="formInline.password"
           type="password"
-          placeholder="123456"
+          placeholder="admin"
+          autocomplete="new-password"
         >
           <template #prefix
             ><LockOutlined style="color: rgba(0, 0, 0, 0.25)"
           /></template>
         </a-input>
-      </a-form-item>
-      <a-form-item :rules="{ required: true, message: '请填写验证码' }">
-        <div class="vertify-container">
-          <a-input v-model:value="verify" placeholder="输入验证码" />
-          <vue-img-verify ref="verifyRef" />
-        </div>
       </a-form-item>
       <a-form-item>
         <a-button
@@ -52,82 +47,69 @@
   </div>
 </template>
 
-<script lang="ts">
+<script >
 import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
-import { ValidateErrorEntity } from "ant-design-vue/es/form/interface";
 import { message } from "ant-design-vue";
 import { defineComponent, reactive, toRefs, ref } from "vue";
-import { useStore } from "@/store";
+import store from "../../store/index";
 import { useRoute, useRouter } from "vue-router";
-import { UserActionTypes } from "@/store/modules/user/actions";
 
 export default defineComponent({
   name: "login",
   setup() {
-    const verifyRef = ref<any>(null);
-    const formState: FormState = reactive({
+    const formState = reactive({
       loading: false,
-      verify: "",
       imgCode: "",
       formInline: {
-        user: "",
+        username: "",
         password: "",
       },
     });
-    const store = useStore();
     const route = useRoute();
     const router = useRouter();
     // 处理提交
     const handleFinish = async () => {
-      const { user: username, password } = formState.formInline;
+      const { username, password } = formState.formInline;
       if (username.trim() === "" || password.trim() === "")
         return message.warning("用户名或者密码不能为空");
-      // 获取验证码
-      formState.imgCode = verifyRef.value.imgCode || "";
-      console.log(formState.verify);
-
-      if (formState.verify.toLowerCase() != formState.imgCode.toLowerCase()) {
-        message.warning("验证码错误");
-        return;
-      }
       // 启动加载
       formState.loading = true;
-      const params = {
-        username,
-        password,
-      };
+
+      console.log(store);
 
       // 发送请求
       const res = await store
-        .dispatch(UserActionTypes.Login, params)
+        .dispatch("user/login", {
+          username,
+          password,
+        })
         .finally(() => {
           formState.loading = false;
           message.destroy();
         });
       const { code, message: msg } = res;
-      if (code === 0) {
-        const toPath = decodeURIComponent(
-          (route.query?.redirect || "/") as string
-        );
-        message.success("登录成功!");
-        router.replace(toPath).then(() => {
-          if (route.name === "login") {
-            router.replace("/");
-          }
-        });
+      if (code === 200) {
+        // const toPath = decodeURIComponent(
+        //   (route.query?.redirect || "/") as string
+        // );
+        // message.success("登录成功!");
+        // router.replace(toPath).then(() => {
+        //   if (route.name === "login") {
+        //     router.replace("/");
+        //   }
+        // });
       } else {
         message.info(msg || "登录失败!");
       }
     };
     // 处理提交失败
-    const handleFinishFailed = (errors: ValidateErrorEntity<FormState>) => {
+    const handleFinishFailed = (errors) => {
       console.log(errors);
     };
     return {
       ...toRefs(formState),
       handleFinish,
       handleFinishFailed,
-      verifyRef,
     };
   },
   components: {

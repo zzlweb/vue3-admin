@@ -1,13 +1,15 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from '@/router/index.js'
-import { setupStore } from '@/store/index.js'
+import store from '@/store/index.js'
 import { AppConfig } from '@/config/app.js'
 import { loadAllPlugins } from '@/plugin/index.js'
 import { RegisterCommonComponent } from '@/components/index.js'
 
 // 引入样式文件
 import '@/styles/index.less'
+
+import '@/mock/index'
 
 /** 将全局静态配置注入到应用中,可以通过 this.a读取,比 provide 和 inject 手动注入更方便  */
 /** 构造一个由function 的返回类型组成的 type */
@@ -20,7 +22,4 @@ loadAllPlugins(app)
 // 自动注册全局组件
 RegisterCommonComponent(app)
 
-// vuex 
-setupStore(app)
-
-app.use(router).mount('#app')
+app.use(store).use(router).mount('#app')
