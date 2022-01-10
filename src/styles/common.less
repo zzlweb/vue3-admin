@@ -1,0 +1,122 @@
+/*---------------------------scrollbar--------------------------*/
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+  background-color: transparent;
+  // border-left:1px solid @BtnBorder;
+  // border-top:1px solid @BtnBorder;
+}
+
+::-webkit-scrollbar:hover {
+  //background-color:#f5f7fa;
+}
+
+::-webkit-scrollbar-track {
+  //background-color:transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #C4C4C4;
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb:decrement {
+  border-width: 0;
+  border-color: transparent;
+}
+
+::-webkit-scrollbar-thumb:increment {
+  border-width: 0;
+  border-color: transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  // background-color: #D1D1D1;
+}
+
+::-webkit-scrollbar-button:decrement {
+  //display:none;
+  //width: 16px;
+  //height: 25px;
+  //background:url(../../Images/scrollBtn.png);
+  //background-position:top;
+}
+
+::-webkit-scrollbar-button:increment {
+  //display:none;
+  //width: 16px;
+  //height: 25px;
+  //background:url(../../Images/scrollBtn.png);
+  //background-position:bottom;
+}
+
+::-webkit-scrollbar-button:hover {
+  //background-color:#ccc;border-radius: 1em;border:1px solid rgba(0,0,0,0.1);
+}
+
+::-webkit-scrollbar-corner {
+  //background-color:@BG;
+}
+
+::-webkit-resizer {}
+
+
+/*---------------------------layout--------------------------*/
+.flex-col {
+  .flex-col;
+}
+
+.flex-row {
+  .flex-row;
+}
+
+.fill-flex {
+  .fill-flex;
+}
+
+.flex-col(@flex: flex, @Row: column, @wrap: nowrap) {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: @flex;
+  -webkit-box-orient: horizontal;
+  //horizontal    vertical
+  -moz-box-direction: @Row;
+  -ms-flex-direction: @Row;
+  -webkit-flex-direction: @Row;
+  flex-direction: @Row;
+  -webkit-box-wrap: @wrap;
+  -moz-box-wrap: @wrap;
+  -ms-flex-wrap: @wrap;
+  -webkit-flex-wrap: @wrap;
+  flex-wrap: @wrap;
+}
+
+.flex-row(@flex: flex, @Col: row, @wrap: nowrap) {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: @flex;
+  -webkit-box-orient: vertical;
+  -moz-box-direction: @Col;
+  -ms-flex-direction: @Col;
+  -webkit-flex-direction: @Col;
+  flex-direction: @Col;
+  -webkit-box-wrap: @wrap;
+  -moz-box-wrap: @wrap;
+  -ms-flex-wrap: @wrap;
+  -webkit-flex-wrap: @wrap;
+  flex-wrap: @wrap;
+}
+
+.fill-flex(@fill: 1) {
+  -webkit-box-flex: @fill;
+  -moz-box: @fill;
+  -webkit-flex: @fill;
+  -ms-flex: @fill;
+  flex: @fill;
+}
