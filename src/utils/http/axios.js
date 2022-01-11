@@ -5,6 +5,7 @@ import Axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from 'axios'
 import router from '@/router'
 import { message } from 'ant-design-vue'
 import Store from '@/store'
+import { getToken } from '@/utils/auth.js'
 /**
  * 根据状态码获取message
  * @param {AxiosResponse} response Axios  response object
@@ -70,11 +71,10 @@ const http = Axios.create({
  * @returns {AxiosRequestConfig} config
  */
 http.interceptors.request.use((config) => {
-  if (Store.user.getters.token) {
+  if (Store.getters.token) {
     config.headers['X-Token'] = getToken()
   }
   return config
-
 })
 
 /**
@@ -84,10 +84,9 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   response => {
     const res = response.data
-    // 请求失败
+    // 接口请求失败
     if (res.code !== 200) {
-      message.info(res.message || 'Error', 2)
-
+      message.info(res.message || 'error', 2)
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // to re-login

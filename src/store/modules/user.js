@@ -33,14 +33,21 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
+      try {
+        login({ username, password }).then(response => {
+          if(response.data.code === 200){
+            const { data } = response
+            commit('SET_TOKEN', data.token)
+            commit('SET_ROLES', data.roles)
+            setToken(data.token)
+          }
+          resolve(response)
+        }).catch(error => {
+          reject(error)
+        })
+      } catch (error) {
+        console.log('login接口请求失败');
+      }
     })
   },
 
@@ -79,7 +86,7 @@ const actions = {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
-        resetRouter()
+        // resetRouter()
 
         // reset visited views and cached views
         // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
@@ -111,7 +118,7 @@ const actions = {
 
     const { roles } = await dispatch('getInfo')
 
-    resetRouter()
+    // resetRouter()
 
     // generate accessible routes map based on roles
     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })

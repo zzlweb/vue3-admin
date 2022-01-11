@@ -1,8 +1,7 @@
 import http from '@/utils/http/axios'
 
-const Api =  {
-  login = '/login',
-  logout = '/logout'
+const Api = {
+  login: '/user/login',
 }
 
 /**
@@ -12,8 +11,6 @@ export function login(params) {
   return http({
     url: Api.login,
     method: 'POST',
-    params
-  }, {
-    isTransformRequestResult: false
+    data: {...params}
   })
 }

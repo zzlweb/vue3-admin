@@ -59,7 +59,6 @@ export default defineComponent({
   setup() {
     const formState = reactive({
       loading: false,
-      imgCode: "",
       formInline: {
         username: "",
         password: "",
@@ -68,39 +67,41 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     // 处理提交
-    const handleFinish = async () => {
+    const handleFinish = () => {
       const { username, password } = formState.formInline;
-      if (username.trim() === "" || password.trim() === "")
+      if (username.trim() === "" || password.trim() === "") {
+        message.destroy();
         return message.warning("用户名或者密码不能为空");
+      }
       // 启动加载
       formState.loading = true;
-
-      console.log(store);
-
       // 发送请求
-      const res = await store
+      store
         .dispatch("user/login", {
           username,
           password,
         })
-        .finally(() => {
+        .then((res) => {
+          const { data } = res;
+          if (data.code === 200) {
+            const toPath = route.query?.redirect || "/home";
+            message.success("登录成功!");
+            router.replace(toPath).then(() => {
+              if (route.name === "login") {
+                router.replace("/home");
+              }
+            });
+          } else {
+            message.error(data.message || "登录失败!");
+            formState.loading = false;
+            message.destroy();
+          }
+        })
+        .catch(() => {
+          message.error(data.message || "登录失败!");
           formState.loading = false;
           message.destroy();
         });
-      const { code, message: msg } = res;
-      if (code === 200) {
-        // const toPath = decodeURIComponent(
-        //   (route.query?.redirect || "/") as string
-        // );
-        // message.success("登录成功!");
-        // router.replace(toPath).then(() => {
-        //   if (route.name === "login") {
-        //     router.replace("/");
-        //   }
-        // });
-      } else {
-        message.info(msg || "登录失败!");
-      }
     };
     // 处理提交失败
     const handleFinishFailed = (errors) => {

@@ -165,22 +165,27 @@ export default {
       return {
         code: 200,
         data: {
+          code: 200, 
           token: 'vue-admin',
-          message: '登陆成功'
+          message: '登陆成功', 
+          roles: 'admin'
         }
       }
     } else if (username === 'editor' && password === 'editor') {
       return {
         code: 200,
         data: {
+          code: 200, 
           token: 'vue-editor',
-          message: '登陆成功'
+          message: '登陆成功', 
+          roles: 'editor'
         }
       }
     } else {
       return {
-        code: 400,
+        code: 200,
         data: {
+          code: 400,
           message: '用户不存在'
         }
       }

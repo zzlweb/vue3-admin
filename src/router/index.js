@@ -2,8 +2,6 @@ import {
   createRouter,
   createWebHashHistory,
 } from 'vue-router'
-import Home from '@/views/Home/index.vue'
-import NotFound from '@/views/404/index.vue'
 import Layout from '@/layout/index.vue'
 
 /**
@@ -16,18 +14,15 @@ file.keys().forEach(key => {
   modules.push(file(key).default)
 })
 
-const routes = [{
-    path: '/login',
-    name: 'login',
-    component: () => import( /* webpackChunkName: "login" */ '@/views/Login/index.vue')
-  }, {
+// 固定路由
+const ConstRoutes = [ {
     path: '/',
     component: Layout,
     redirect: '/Home',
     children: [{
         path: 'Home',
         name: '首页',
-        component: Home,
+        component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue'),
         meta: {
           title: '首页'
         }
@@ -40,27 +35,70 @@ const routes = [{
         hidden: true,
         children: [{
           path: '/redirect/:path(.*)',
-          component: () => import('@/views/redirect/index')
+          component: () => import(/* webpackChunkName: "redirect" */ '@/views/redirect/index')
         }]
       },
       {
         path: '/:pathMatch(.*)',
-        component: NotFound,
+        component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
         hidden: true
       }
     ]
   },
   {
+    path: '/login',
+    name: 'login',
+    component: () => import( /* webpackChunkName: "login" */ '@/views/Login/index.vue')
+  },
+  {
     path: '/:pathMatch(.*)',
     name: '404',
-    component: NotFound,
+    component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
     hidden: true
   }
 ]
 
+// 异步路由
+export const asyncRoutes = [
+  {
+    path: '/pdf',
+    component: Layout,
+    redirect: '/pdf/index',
+    children: [{
+      path: 'index',
+      component: () => import('@/views/PDF/index'),
+      name: 'pdf',
+      meta: {
+        title: 'pdf',
+        roles: ['admin']
+      }
+    }]
+  },
+  {
+    path: '/permission',
+    component: Layout,
+    redirect: '/permission/index',
+    children: [{
+      path: 'index',
+      component: () => import('@/views/Permission/index'),
+      name: 'permission',
+      meta: {
+        title: 'permission',
+        roles: ['editor']
+      }
+    }]
+  },
+]
+
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes: ConstRoutes
 })
+
+// 重置路由
+export function resetRouter() {
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher 
+}
 
 export default router
