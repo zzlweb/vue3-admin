@@ -1,6 +1,7 @@
-import router , {resetRouter}from './router'
+import router from './router'
 import store from './store'
 import { message } from 'ant-design-vue'
+import { getRoles } from '@/utils/auth.js'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import {
@@ -35,31 +36,24 @@ router.beforeEach(async (to, from, next) => {
       // 正确为逻辑为有角色next() 没有角色去获取然后动态生成可访问路由。这里是为了mock,每次路由访问都动态生成路由。
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
-        try {
-          // 重置路由，再次动态生成
-          await resetRouter()
+        const roles = getRoles()
+        // generate accessible routes map based on roles
+        const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
 
-          const accessRoutes = await store.dispatch('permission/generateRoutes', hasRoles)
+        // dynamically add accessible routes
+        router.addRoute(accessRoutes)
 
-          router.addRoutes(accessRoutes)
-
-          next({
-            ...to,
-            replace: true
-          })
-        } catch (error) {
-          await store.dispatch('user/resetToken')
-          message.error(error || 'Has Error')
-          next(`/login?redirect=${to.path}`)
-          NProgress.done()
-        }
+        // hack method to ensure that addRoutes is complete
+        // set the replace: true, so the navigation will not leave a history record
+        next()
+        NProgress.done()
       } else {
         // 有token, 没有角色, 重新登陆。
         await store.dispatch('user/resetToken')
-        message.error(error || 'Has Error')
+        message.error('身份过期')
         next(`/login?redirect=${to.path}`)
         NProgress.done()
-      }
+        }
     }
   } else {
     /* has no token*/

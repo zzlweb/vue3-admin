@@ -67,7 +67,7 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     // 处理提交
-    const handleFinish = () => {
+    const handleFinish = async () => {
       const { username, password } = formState.formInline;
       if (username.trim() === "" || password.trim() === "") {
         message.destroy();
@@ -76,32 +76,27 @@ export default defineComponent({
       // 启动加载
       formState.loading = true;
       // 发送请求
-      store
-        .dispatch("user/login", {
-          username,
-          password,
-        })
-        .then((res) => {
-          const { data } = res;
-          if (data.code === 200) {
-            const toPath = route.query?.redirect || "/home";
-            message.success("登录成功!");
-            router.replace(toPath).then(() => {
-              if (route.name === "login") {
-                router.replace("/home");
-              }
-            });
-          } else {
-            message.error(data.message || "登录失败!");
-            formState.loading = false;
-            message.destroy();
-          }
-        })
-        .catch(() => {
-          message.error(data.message || "登录失败!");
-          formState.loading = false;
-          message.destroy();
-        });
+      const res = await store.dispatch("user/login", {
+        username,
+        password,
+      });
+      const { data } = res;
+      try {
+        if (data.code === 200) {
+        const toPath = route.query?.redirect || "/";
+        message.success("登录成功!");
+        router.replace(toPath)
+      } else {
+        message.error(data.message || "登录失败!");
+        formState.loading = false;
+        message.destroy();
+      }
+      } catch (error) {
+        store.dispatch('user/resetToken')
+        message.error("登录失败!");
+        formState.loading = false;
+        message.destroy();
+      }
     };
     // 处理提交失败
     const handleFinishFailed = (errors) => {

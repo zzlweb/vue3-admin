@@ -168,7 +168,7 @@ export default {
           code: 200, 
           token: 'vue-admin',
           message: '登陆成功', 
-          roles: 'admin'
+          roles:['admin']
         }
       }
     } else if (username === 'editor' && password === 'editor') {
@@ -178,7 +178,7 @@ export default {
           code: 200, 
           token: 'vue-editor',
           message: '登陆成功', 
-          roles: 'editor'
+          roles: ['editor']
         }
       }
     } else {

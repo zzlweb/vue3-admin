@@ -7,15 +7,15 @@ import Layout from '@/layout/index.vue'
 /**
  * 自动加载其他路由模块
  */
-const file = require.context('.', true, /\.ts$/)
+const file = require.context('.', true, /\.js$/)
 const modules = []
 file.keys().forEach(key => {
-  if (key === './index.ts') return
+  if (key === './index.js') return
   modules.push(file(key).default)
 })
 
 // 固定路由
-const ConstRoutes = [ {
+export const constantRoutes = [ {
     path: '/',
     component: Layout,
     redirect: '/Home',
@@ -48,13 +48,8 @@ const ConstRoutes = [ {
   {
     path: '/login',
     name: 'login',
+    hidden: true, 
     component: () => import( /* webpackChunkName: "login" */ '@/views/Login/index.vue')
-  },
-  {
-    path: '/:pathMatch(.*)',
-    name: '404',
-    component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
-    hidden: true
   }
 ]
 
@@ -64,14 +59,14 @@ export const asyncRoutes = [
     path: '/pdf',
     component: Layout,
     redirect: '/pdf/index',
+    meta: {
+      title: 'pdf',
+      roles: ['admin']
+    },
     children: [{
       path: 'index',
       component: () => import('@/views/PDF/index'),
       name: 'pdf',
-      meta: {
-        title: 'pdf',
-        roles: ['admin']
-      }
     }]
   },
   {
@@ -88,11 +83,17 @@ export const asyncRoutes = [
       }
     }]
   },
+  {
+    path: '/:pathMatch(.*)',
+    name: '404',
+    component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
+    hidden: true
+  }
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: ConstRoutes
+  routes: constantRoutes
 })
 
 // 重置路由

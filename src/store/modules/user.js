@@ -1,5 +1,5 @@
 import { login } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, getRoles, setRoles, removeRoles } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
 const state = {
@@ -7,7 +7,7 @@ const state = {
   name: '',
   avatar: '',
   introduction: '',
-  roles: []
+  roles: getRoles(),
 }
 
 const mutations = {
@@ -40,6 +40,7 @@ const actions = {
             commit('SET_TOKEN', data.token)
             commit('SET_ROLES', data.roles)
             setToken(data.token)
+            setRoles(data.roles)
           }
           resolve(response)
         }).catch(error => {
@@ -86,7 +87,8 @@ const actions = {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
-        // resetRouter()
+        removeRoles()
+        resetRouter()
 
         // reset visited views and cached views
         // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
