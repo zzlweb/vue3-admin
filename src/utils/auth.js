@@ -16,11 +16,12 @@ export function removeToken() {
 }
 
 export function getRoles() {
- return  Cookies.get(RolesKey)
+ return Cookies.get(RolesKey) && JSON.parse(Cookies.get(RolesKey))
 }
 
 export function setRoles(item) {
-  return Cookies.set(RolesKey, item)
+  const value = JSON.stringify(item)
+  return Cookies.set(RolesKey, value)
 }
 
 export function removeRoles() {

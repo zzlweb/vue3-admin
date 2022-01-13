@@ -9,10 +9,13 @@
 </template>
 
 <script >
-import { defineComponent } from "vue";
-
+import { defineComponent} from "vue";
+import { useRouter } from 'vue-router'
 export default defineComponent({
   name: "Home",
   components: {},
+  setup() {
+    const router = useRouter()
+  }
 });
 </script>

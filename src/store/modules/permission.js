@@ -7,7 +7,6 @@ import { asyncRoutes, constantRoutes } from '@/router'
  */
 // 
 function hasPermission(roles, route) {
-  console.log(roles);
   if (route.meta && route.meta.roles) {
     return roles.some(role => route.meta.roles.includes(role))
   } else {
@@ -18,7 +17,7 @@ function hasPermission(roles, route) {
 /**
  * Filter asynchronous routing tables by recursion
  * @param routes asyncRoutes
- * @param roles
+ * @param roles  ['admin]
  */
 export function filterAsyncRoutes(routes, roles) {
   const res = []
@@ -45,7 +44,6 @@ const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes)
-    console.log(state.routes);
   }
 }
 

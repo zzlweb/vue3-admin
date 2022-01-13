@@ -50,7 +50,8 @@ export const constantRoutes = [ {
     name: 'login',
     hidden: true, 
     component: () => import( /* webpackChunkName: "login" */ '@/views/Login/index.vue')
-  }
+  },
+  
 ]
 
 // 异步路由
@@ -73,17 +74,16 @@ export const asyncRoutes = [
     path: '/permission',
     component: Layout,
     redirect: '/permission/index',
+    meta: {
+      title: 'permission',
+      roles: ['editor']
+    },
     children: [{
       path: 'index',
       component: () => import('@/views/Permission/index'),
       name: 'permission',
-      meta: {
-        title: 'permission',
-        roles: ['editor']
-      }
     }]
-  },
-  {
+  },{
     path: '/:pathMatch(.*)',
     name: '404',
     component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
