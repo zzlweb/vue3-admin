@@ -9,7 +9,6 @@
       <a-sub-menu key="sub1">
         <template #title>
           <span>
-            <user-outlined />
             subnav 1
           </span>
         </template>
@@ -23,10 +22,17 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent , ref} from "vue";
 
 export default defineComponent({
-  setup() {},
+  setup() {
+    return {
+      selectedKeys1: ref(["2"]),
+      selectedKeys2: ref(["1"]),
+      collapsed: ref(false),
+      openKeys: ref(["sub1"]),
+    };
+  },
 });
 </script>
 

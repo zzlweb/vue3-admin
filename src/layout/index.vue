@@ -19,13 +19,12 @@
   </a-layout>
 </template>
 <script>
-import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
+import {  LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
 import { defineComponent, ref } from 'vue';
 import Side from './Side.vue' 
 import Headers from './Header.vue' 
 export default defineComponent({
   components: {
-    UserOutlined,
     LaptopOutlined,
     NotificationOutlined,
     Side, 
@@ -34,10 +33,7 @@ export default defineComponent({
 
   setup() {
     return {
-      selectedKeys1: ref(['2']),
-      selectedKeys2: ref(['1']),
-      collapsed: ref(false),
-      openKeys: ref(['sub1']),
+
     };
   },
 });

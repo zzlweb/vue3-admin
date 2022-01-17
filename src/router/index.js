@@ -98,8 +98,9 @@ const router = createRouter({
 
 // 重置路由
 export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher 
+  // const newRouter = createRouter()
+  // router.matcher = newRouter.matcher 
+  router.options.routes = []
 }
 
 export default router
