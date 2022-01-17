@@ -2,7 +2,7 @@
   <a-layout>
     <Headers />
     <a-layout>
-      <side></side>
+      <side />
       <a-layout style="padding: 0 24px 24px">
         <a-breadcrumb style="margin: 16px 0">
           <a-breadcrumb-item>Home</a-breadcrumb-item>
@@ -21,7 +21,7 @@
 <script>
 import {  LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
 import { defineComponent, ref } from 'vue';
-import Side from './Side.vue' 
+import Side from './Side/index.vue' 
 import Headers from './Header.vue' 
 export default defineComponent({
   components: {

@@ -18,17 +18,16 @@ file.keys().forEach(key => {
 export const constantRoutes = [ {
     path: '/',
     component: Layout,
-    redirect: '/Home',
-    children: [{
-        path: 'Home',
-        name: '首页',
-        component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue'),
+    redirect: '/Home', 
+    name: '首页',
+    children: [
+      {
         meta: {
-          title: '首页'
-        }
+          title: '首页',
+        },
+        path: '/Home',
+        component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue'),
       },
-      ...modules,
-
       {
         path: '/redirect',
         component: Layout,
@@ -45,13 +44,13 @@ export const constantRoutes = [ {
       }
     ]
   },
+  ...modules,
   {
     path: '/login',
     name: 'login',
     hidden: true, 
     component: () => import( /* webpackChunkName: "login" */ '@/views/Login/index.vue')
   },
-  
 ]
 
 // 异步路由
@@ -59,15 +58,15 @@ export const asyncRoutes = [
   {
     path: '/pdf',
     component: Layout,
+    name: 'PDF',
     redirect: '/pdf/index',
     meta: {
-      title: 'pdf',
+      title: 'PDF',
       roles: ['admin']
     },
     children: [{
       path: 'index',
       component: () => import('@/views/PDF/index'),
-      name: 'pdf',
     }]
   },
   {
