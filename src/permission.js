@@ -1,4 +1,4 @@
-import router from './router'
+import router ,  {resetRouter,constantRoutes} from './router'
 import store from './store'
 import { message } from 'ant-design-vue'
 import NProgress from 'nprogress' // progress bar
@@ -35,25 +35,14 @@ router.beforeEach(async (to, from, next) => {
       // 正确为逻辑为有角色next() 没有角色去获取然后动态生成可访问路由。这里是为了mock,每次路由访问都动态生成路由。
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
-        const roles = store.getters.roles
+
         // generate accessible routes map based on roles
-        const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+        const accessRoutes = await store.dispatch('permission/generateRoutes', store.getters.roles)
         // 获取当前默认路由
-        const currentRoutes = router.options.routes
-        accessRoutes.forEach(item => {
-          // hasRouter 用于判断当前路由中是否含有，避免重复添加
-          const has = currentRoutes.some(it => {it.path === item.path})
-          if(!has){
-            currentRoutes.push(item)
-          }
-        })
-
-        currentRoutes.forEach(item => {
-          router.addRoute(item)
-        })
-
-        console.log(router);
-
+        const currentRoutes = constantRoutes
+        // 清空路由
+        resetRouter()
+        router.options.routes = [...currentRoutes, ...accessRoutes]
         // 不能使用 ...to 进行放行，没有跳出条件，会陷入路由死循环。
         next()
         NProgress.done()

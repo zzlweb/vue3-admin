@@ -30,7 +30,7 @@ export default defineComponent({
       try {
         if(key ===  '1') {
           await store.dispatch('user/logout')
-          message.error('退出登录成功！')
+          message.success('退出登录成功！')
           location.reload()
         }
       } catch (error) {

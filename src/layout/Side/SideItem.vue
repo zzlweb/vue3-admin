@@ -5,13 +5,13 @@
         v-if="onlyOneChild.meta"
         :to="resolvePath(onlyOneChild.path)"
       >
-        <a-menu-item :key="item.key">
+        <a-menu-item >
           {{ item.name }}
         </a-menu-item>
       </router-link>
     </template>
     <template v-else>
-      <sub-menu :key="item.key" :menu-info="item" />
+      <sub-menu :key="item.path" :menu-info="item" />
     </template>
   </div>
 </template>
@@ -19,30 +19,7 @@
 <script>
 import { isExternal } from  '@/utils/validate.js'
 import path from 'path'
-const SubMenu = {
-  name: "SubMenu",
-  props: {
-    menuInfo: {
-      type: Object,
-      default: () => ({}),
-    },
-  },
-  template: `
-    <a-sub-menu :key="menuInfo.key">
-      <template #title>{{ menuInfo.title }}</template>
-      <template v-for="item in menuInfo.children" :key="item.key">
-        <template v-if="!item.children || item.hidden">
-          <a-menu-item :key="item.key">
-            {{ item.name }}
-          </a-menu-item>
-        </template>
-        <template v-else>
-          <sub-menu :menu-info="item" :key="item.key" />
-        </template>
-      </template>
-    </a-sub-menu>
-  `,
-};
+
 import { defineComponent, ref } from "vue";
 export default {
   setup(props) {
@@ -86,9 +63,6 @@ export default {
       onlyOneChild,
       resolvePath
     };
-  },
-  components: {
-    "sub-menu": SubMenu,
   },
   props: {
     item: {

@@ -22,11 +22,10 @@ export const constantRoutes = [ {
     name: '首页',
     children: [
       {
-        meta: {
-          title: '首页',
-        },
         path: '/Home',
         component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue'),
+        meta: {
+        },
       },
       {
         path: '/redirect',
@@ -60,27 +59,25 @@ export const asyncRoutes = [
     component: Layout,
     name: 'PDF',
     redirect: '/pdf/index',
-    meta: {
-      title: 'PDF',
-      roles: ['admin']
-    },
     children: [{
       path: 'index',
+      meta: {
+        roles: ['admin']
+      },
       component: () => import('@/views/PDF/index'),
     }]
   },
   {
     path: '/permission',
     component: Layout,
+    name: 'permission',
     redirect: '/permission/index',
-    meta: {
-      title: 'permission',
-      roles: ['editor']
-    },
     children: [{
       path: 'index',
+      meta: {
+        roles: ['editor']
+      },
       component: () => import('@/views/Permission/index'),
-      name: 'permission',
     }]
   },{
     path: '/:pathMatch(.*)',

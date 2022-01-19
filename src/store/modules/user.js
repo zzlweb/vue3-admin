@@ -114,7 +114,7 @@ const actions = {
 
     const { roles } = await dispatch('getInfo')
 
-    // resetRouter()
+    resetRouter()
 
     // generate accessible routes map based on roles
     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })

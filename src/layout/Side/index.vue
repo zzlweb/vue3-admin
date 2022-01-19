@@ -8,7 +8,7 @@
     >
       <side-item
         v-for="route in list"
-        :key="route.path"
+        :key="route.name"
         :item="route"
         :base-path="route.path"
       ></side-item>
