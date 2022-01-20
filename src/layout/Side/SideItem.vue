@@ -5,7 +5,7 @@
         v-if="onlyOneChild.meta"
         :to="resolvePath(onlyOneChild.path)"
       >
-        <a-menu-item >
+        <a-menu-item :key="item.name">
           {{ item.name }}
         </a-menu-item>
       </router-link>
@@ -17,10 +17,10 @@
 </template>
 
 <script>
-import { isExternal } from  '@/utils/validate.js'
-import path from 'path'
+import { isExternal } from '@/utils/validate.js';
+import path from 'path';
 
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref } from 'vue';
 export default {
   setup(props) {
     const onlyOneChild = ref(null);
@@ -41,7 +41,7 @@ export default {
       }
       // Show parent if there are no child router to display
       if (showingChildren.length === 0) {
-        onlyOneChild.value = { ...parent, path: "", noShowingChildren: true };
+        onlyOneChild.value = { ...parent, path: '', noShowingChildren: true };
         return true;
       }
       return false;
@@ -61,7 +61,7 @@ export default {
     return {
       hasOneShowingChild,
       onlyOneChild,
-      resolvePath
+      resolvePath,
     };
   },
   props: {
@@ -71,7 +71,7 @@ export default {
     },
     basePath: {
       type: String,
-      default: "",
+      default: '',
     },
   },
 };

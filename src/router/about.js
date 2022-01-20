@@ -1,21 +1,25 @@
-import Layout  from '@/layout/index.vue'
+import Layout from '@/layout/index.vue'
 
 /** 关于我们页面的路由配置 */
-const AboutRouter= {
+const AboutRouter = {
   path: '/test',
-  component: Layout, 
-  name: '测试页面',
+  component: Layout,
   redirect: '/test/index',
+  name: '测试',
   children: [{
-    path: 'index', 
-    name:"关于页面",
-    meta: { },
-    component: () => import(/* webpackChunkName: "about" */ '@/views/About/index.vue'),
+    name: '测试页面',
+    path: 'index',
+    meta: {
+      title: '测试页面'
+    },
+    component: () => import(/* webpackChunkName: "about" */ '@/views/About/index.vue')
   }, {
-    path: 'svg', 
-    name:"svg页面",
+    path: 'svg',
+    name: 'svg页面',
     component: () => import(/* webpackChunkName: "about" */ '@/views/Svg/index.vue'),
-    meta: {}
+    meta: {
+      title: 'svg页面'
+    }
   }]
 }
 

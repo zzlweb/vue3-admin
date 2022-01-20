@@ -10,7 +10,12 @@
           <a-breadcrumb-item>App</a-breadcrumb-item>
         </a-breadcrumb>
         <a-layout-content
-          :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
+          :style="{
+            background: '#fff',
+            padding: '24px',
+            margin: 0,
+            minHeight: '280px',
+          }"
         >
           <router-view></router-view>
         </a-layout-content>
@@ -19,21 +24,20 @@
   </a-layout>
 </template>
 <script>
-import {  LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
+import { LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
 import { defineComponent, ref } from 'vue';
-import Side from './Side/index.vue' 
-import Headers from './Header.vue' 
+import Side from './Side/index.vue';
+import Headers from './Header.vue';
 export default defineComponent({
   components: {
     LaptopOutlined,
     NotificationOutlined,
-    Side, 
-    Headers
+    Side,
+    Headers,
   },
 
   setup() {
-    return {
-    };
+    return {};
   },
 });
 </script>

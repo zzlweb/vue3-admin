@@ -10,16 +10,16 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        'vue$': 'vue/dist/vue.esm-bundler.js'
-      }
-    }
+        vue$: 'vue/dist/vue.esm-bundler.js',
+      },
+    },
   },
   // 解决 antd less 警告
   css: {
     loaderOptions: {
       less: {
-        javascriptEnabled: true
-      }
-    }
+        javascriptEnabled: true,
+      },
+    },
   },
-}
+};

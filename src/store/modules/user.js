@@ -7,7 +7,7 @@ const state = {
   name: '',
   avatar: '',
   introduction: '',
-  roles: getRoles(),
+  roles: getRoles()
 }
 
 const mutations = {
@@ -35,7 +35,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       try {
         login({ username, password }).then(response => {
-          if(response.data.code === 200){
+          if (response.data.code === 200) {
             const { data } = response
             commit('SET_TOKEN', data.token)
             commit('SET_ROLES', data.roles)
@@ -47,7 +47,7 @@ const actions = {
           reject(error)
         })
       } catch (error) {
-        console.log('login接口请求失败');
+        console.log('login接口请求失败')
       }
     })
   },
@@ -83,15 +83,15 @@ const actions = {
   // user logout
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
-        commit('SET_TOKEN', '')
-        commit('SET_ROLES', [])
-        removeToken()
-        removeRoles()
-        resetRouter()
-        // reset visited views and cached views
-        // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
-        // dispatch('tagsView/delAllViews', null, { root: true })
-        resolve()
+      commit('SET_TOKEN', '')
+      commit('SET_ROLES', [])
+      removeToken()
+      removeRoles()
+      resetRouter()
+      // reset visited views and cached views
+      // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
+      // dispatch('tagsView/delAllViews', null, { root: true })
+      resolve()
     })
   },
 
