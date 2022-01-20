@@ -101,6 +101,7 @@ a {
   text-decoration: none;
   outline-offset: none;
   outline: none;
+  color: rgba(0, 0, 0, 0.65);
 }
 
 a:hover,

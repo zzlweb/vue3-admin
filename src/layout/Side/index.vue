@@ -20,9 +20,10 @@
 import { defineComponent, ref } from "vue";
 import router from "@/router";
 import sideItem from "./SideItem.vue";
+import store from '@/store'
 export default defineComponent({
   setup() {
-    const list = router.options.routes;
+    const list = store.getter.permissionRouter
 
     return {
       list,
@@ -35,6 +36,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="less" scoped>
-</style>

@@ -11,7 +11,7 @@
       </router-link>
     </template>
     <template v-else>
-      <sub-menu :key="item.path" :menu-info="item" />
+      <sub-menu :menu-info="item" :subPath="item.path" />
     </template>
   </div>
 </template>

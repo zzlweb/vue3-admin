@@ -34,7 +34,6 @@ export default defineComponent({
           location.reload()
         }
       } catch (error) {
-        console.log(error)
         message.error('退出登录失败！')
       }
     };

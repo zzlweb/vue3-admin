@@ -64,7 +64,7 @@ export const asyncRoutes = [
       meta: {
         roles: ['admin']
       },
-      component: () => import('@/views/PDF/index'),
+      component: () => import(/* webpackChunkName: "PDF" */ '@/views/PDF/index'),
     }]
   },
   {
@@ -77,7 +77,7 @@ export const asyncRoutes = [
       meta: {
         roles: ['editor']
       },
-      component: () => import('@/views/Permission/index'),
+      component: () => import(/* webpackChunkName: "permission" */'@/views/Permission/index'),
     }]
   },{
     path: '/:pathMatch(.*)',
@@ -94,9 +94,8 @@ const router = createRouter({
 
 // 重置路由
 export function resetRouter() {
-  // const newRouter = createRouter()
-  // router.matcher = newRouter.matcher 
-  router.options.routes = []
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher 
 }
 
 export default router
