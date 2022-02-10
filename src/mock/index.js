@@ -14,6 +14,7 @@ Mock.mock(/\/home\/getData/, 'get', homeApi.getStatisticalData)
 
 // 用户相关
 Mock.mock(/\/user\/login/, 'post', userApi.login)
+Mock.mock(/\/user\/getInfo/, 'post', userApi.getInfo)
 // 以下暂无作用
 Mock.mock(/\/user\/getUser/, 'get', userApi.getUserList)
 Mock.mock(/\/user\/del/, 'get', userApi.deleteUser)

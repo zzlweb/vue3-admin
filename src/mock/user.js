@@ -165,20 +165,18 @@ export default {
       return {
         code: 200,
         data: {
-          code: 200, 
+          code: 200,
           token: 'vue-admin',
-          message: '登陆成功', 
-          roles:['admin']
+          message: '登陆成功',
         }
       }
     } else if (username === 'editor' && password === 'editor') {
       return {
         code: 200,
         data: {
-          code: 200, 
+          code: 200,
           token: 'vue-editor',
-          message: '登陆成功', 
-          roles: ['editor']
+          message: '登陆成功',
         }
       }
     } else {
@@ -187,6 +185,35 @@ export default {
         data: {
           code: 400,
           message: '用户不存在'
+        }
+      }
+    }
+  },
+  getInfo: config => {
+    const {params} = JSON.parse(config.body)
+
+    if (params === 'vue-admin') {
+      return {
+        code: 200,
+        data: {
+          code: 200,
+          roles: ['admin']
+        }
+      }
+    } else if (params === 'vue-editor') {
+      return {
+        code: 200,
+        data: {
+          code: 200,
+          roles: ['editor']
+        }
+      }
+    } else {
+      return {
+        code: 200,
+        data: {
+          code: 400,
+          roles: []
         }
       }
     }

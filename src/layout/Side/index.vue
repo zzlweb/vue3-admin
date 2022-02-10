@@ -18,35 +18,26 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs } from 'vue';
-import sideItem from './SideItem.vue';
-import store from '@/store';
-import { useRoute, useRouter } from 'vue-router';
+import { defineComponent, reactive, toRefs, watch } from "vue";
+// 3.0 监听路由改变
+import sideItem from "./SideItem.vue";
+import store from "@/store";
+import { useRoute, useRouter } from "vue-router";
 export default defineComponent({
   setup() {
     const currentRoute = useRoute();
     const router = useRouter();
     const list = store.getters.permissionRouter;
     // 获取当前打开的子菜单
-    const getOpenKeys = () => {
-      // const meta = currentRoute.meta;
-      // if (meta?.activeMenu) {
-      //   const targetMenu = getTargetMenuByActiveMenuName(meta.activeMenu);
-      //   return targetMenu?.meta?.namePath ?? [meta?.activeMenu];
-      // }
-      // return (
-      //   currentRoute.meta?.namePath ??
-      //   currentRoute.matched.slice(1).map((n) => n.name)
-      // );
-    };
     const state = reactive({
       openKeys: [],
       selectedKeys: [currentRoute.name],
     });
 
+    console.log(currentRoute);
+
     // 点击菜单
     const clickMenuItem = ({ key }) => {
-      console.log(key);
       if (key === currentRoute.name) return;
       if (/http(s)?:/.test(key)) {
         window.open(key);
@@ -55,15 +46,19 @@ export default defineComponent({
       }
     };
 
-    console.log(state.selectedKeys, state.openKeys);
+    watch(() => currentRoute.path,() => {
+    console.log('监听到变化')
+    })
+
     return {
       list,
+      currentRoute,
       ...toRefs(state),
       clickMenuItem,
     };
   },
   components: {
-    'side-item': sideItem,
+    "side-item": sideItem,
   },
 });
 </script>

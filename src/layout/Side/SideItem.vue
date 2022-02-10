@@ -1,5 +1,6 @@
 <template>
   <div v-if="!item.hidden">
+    <!-- 只含有一个子路由 -->
     <template v-if="hasOneShowingChild(item.children, item)">
       <router-link
         v-if="onlyOneChild.meta"
@@ -10,6 +11,7 @@
         </a-menu-item>
       </router-link>
     </template>
+    <!-- 含有多个子路由 -->
     <template v-else>
       <sub-menu :menu-info="item" :subPath="item.path" />
     </template>

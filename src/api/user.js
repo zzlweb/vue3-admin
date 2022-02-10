@@ -2,6 +2,7 @@ import http from '@/utils/http/axios'
 
 const Api = {
   login: '/user/login',
+  getInfo: '/user/getInfo'
 }
 
 /**
@@ -12,5 +13,13 @@ export function login(params) {
     url: Api.login,
     method: 'POST',
     data: {...params}
+  })
+}
+
+export function getInfo(params) {
+  return http({
+    url: Api.getInfo,
+    method: 'POST',
+    data: {params}
   })
 }

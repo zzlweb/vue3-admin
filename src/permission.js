@@ -1,9 +1,13 @@
 import router from './router'
 import store from './store'
-import { message } from 'ant-design-vue'
+import {
+  message
+} from 'ant-design-vue'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '@/utils/auth' // get token from cookie
+import {
+  getToken
+} from '@/utils/auth' // get token from cookie
 // import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({
@@ -15,10 +19,6 @@ const whiteList = ['/login', '/auth-redirect'] // no redirect whitelist
 router.beforeEach(async (to, from, next) => {
   // start progress bar
   NProgress.start()
-
-  // set page title
-  // document.title = getPageTitle(to.meta.title)
-
   // determine whether the user has logged in
   const hasToken = getToken()
 
@@ -33,24 +33,30 @@ router.beforeEach(async (to, from, next) => {
       // 正确为逻辑为有角色next() 没有角色去获取然后动态生成可访问路由。这里是为了mock,每次路由访问都动态生成路由。
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
-        // generate accessible routes map based on roles
-        const accessRoutes = await store.dispatch(
-          'permission/generateRoutes',
-          store.getters.roles
-        )
-        accessRoutes.forEach((item) => {
-          router.addRoute(item)
-        })
-
-        // 不能使用 ...to 进行放行，没有跳出条件，会陷入路由死循环。
         next()
-        NProgress.done()
       } else {
-        // 有token, 没有角色, 重新登陆。
-        await store.dispatch('user/resetToken')
-        message.error('身份过期')
-        next(`/login?redirect=${to.path}`)
-        NProgress.done()
+        try {
+          const {roles}  = await store.dispatch('user/getInfo')
+
+          const accessRoutes = await store.dispatch(
+            'permission/generateRoutes',
+            roles
+          )
+          accessRoutes.forEach((item) => {
+            router.addRoute(item)
+          })
+
+          next({
+            ...to,
+            replace: true
+          })
+        } catch (error) {
+          // 有token, 没有角色, 重新登陆。
+          await store.dispatch('user/resetToken')
+          message.error('身份过期')
+          next(`/login?redirect=${to.path}`)
+          NProgress.done()
+        }
       }
     }
   } else {
