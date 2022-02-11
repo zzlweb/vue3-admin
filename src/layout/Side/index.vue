@@ -5,6 +5,7 @@
       v-model:selectedKeys="selectedKeys"
       mode="inline"
       @click="clickMenuItem"
+      @openChange="onOpenChange"
       :style="{ height: '100%', borderRight: 0 }"
     >
       <side-item
@@ -18,8 +19,7 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, watch } from "vue";
-// 3.0 监听路由改变
+import { defineComponent, reactive, toRefs, watch, computed } from "vue";
 import sideItem from "./SideItem.vue";
 import store from "@/store";
 import { useRoute, useRouter } from "vue-router";
@@ -30,13 +30,11 @@ export default defineComponent({
     const list = store.getters.permissionRouter;
     // 获取当前打开的子菜单
     const state = reactive({
-      openKeys: [],
+      rootSubmenuKeys: ['测试'],
+      openKeys: [currentRoute.matched[0].name],
       selectedKeys: [currentRoute.name],
     });
-
-    console.log(currentRoute);
-
-    // 点击菜单
+    // 点击菜单 
     const clickMenuItem = ({ key }) => {
       if (key === currentRoute.name) return;
       if (/http(s)?:/.test(key)) {
@@ -47,14 +45,25 @@ export default defineComponent({
     };
 
     watch(() => currentRoute.path,() => {
-    console.log('监听到变化')
+      state.selectedKeys = [currentRoute.name]
     })
+
+    // submenu 展开收起的回调
+    const onOpenChange = openKeys => {
+      const latestOpenKey = openKeys.find(key => state.openKeys.indexOf(key) === -1);
+      if (state.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
+        state.openKeys = openKeys;
+      } else {
+        state.openKeys = latestOpenKey ? [latestOpenKey] : [];
+      }
+    };
 
     return {
       list,
       currentRoute,
       ...toRefs(state),
       clickMenuItem,
+      onOpenChange
     };
   },
   components: {

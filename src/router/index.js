@@ -23,6 +23,7 @@ export const constantRoutes = [{
   children: [
     {
       path: '/Home',
+      name: '首页',
       component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue'),
       meta: {
         title: '首页'
@@ -58,10 +59,11 @@ export const asyncRoutes = [
   {
     path: '/pdf',
     component: Layout,
-    name: 'PDF',
     redirect: '/pdf/index',
+    name: 'PDF',
     children: [{
       path: 'index',
+      name: 'PDF',
       meta: {
         title: 'PDF',
         roles: ['admin']
@@ -72,10 +74,11 @@ export const asyncRoutes = [
   {
     path: '/permission',
     component: Layout,
-    name: '权限页面',
     redirect: '/permission/index',
+    name: '权限页面',
     children: [{
       path: 'index',
+      name: '权限页面',
       meta: {
         title: '权限页面',
         roles: ['editor']
