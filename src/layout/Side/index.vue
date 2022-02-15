@@ -31,12 +31,15 @@ export default defineComponent({
     // 获取当前打开的子菜单
     const state = reactive({
       rootSubmenuKeys: ['测试'],
+      // 选择了name作为menu的key
       openKeys: [currentRoute.matched[0].name],
       selectedKeys: [currentRoute.name],
     });
     // 点击菜单 
     const clickMenuItem = ({ key }) => {
+      // 重复跳转
       if (key === currentRoute.name) return;
+      // 如果是外链接
       if (/http(s)?:/.test(key)) {
         window.open(key);
       } else {
@@ -48,7 +51,7 @@ export default defineComponent({
       state.selectedKeys = [currentRoute.name]
     })
 
-    // submenu 展开收起的回调
+    //互斥 submenu 展开收起的回调
     const onOpenChange = openKeys => {
       const latestOpenKey = openKeys.find(key => state.openKeys.indexOf(key) === -1);
       if (state.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {

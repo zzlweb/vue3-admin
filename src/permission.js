@@ -30,7 +30,6 @@ router.beforeEach(async (to, from, next) => {
       })
       NProgress.done()
     } else {
-      // 正确为逻辑为有角色next() 没有角色去获取然后动态生成可访问路由。这里是为了mock,每次路由访问都动态生成路由。
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
         next()

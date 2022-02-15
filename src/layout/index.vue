@@ -5,9 +5,14 @@
       <side />
       <a-layout style="padding: 0 24px 24px">
         <a-breadcrumb style="margin: 16px 0">
-          <a-breadcrumb-item>Home</a-breadcrumb-item>
-          <a-breadcrumb-item>List</a-breadcrumb-item>
-          <a-breadcrumb-item>App</a-breadcrumb-item>
+          <a-breadcrumb-item v-for="(item, index) in list" :key="index">
+            <router-link
+              v-if="true"
+              :to="{ path: item.path === '' ? '/' : item.path }"
+              > 测试 </router-link
+            >
+            <span v-else>{{ item.meta.title }}</span>
+          </a-breadcrumb-item>
         </a-breadcrumb>
         <a-layout-content
           :style="{
@@ -24,10 +29,11 @@
   </a-layout>
 </template>
 <script>
-import { LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
-import { defineComponent, ref } from 'vue';
-import Side from './Side/index.vue';
-import Headers from './Header.vue';
+import { LaptopOutlined, NotificationOutlined } from "@ant-design/icons-vue";
+import { defineComponent, onMounted, toRefs, watch, reactive } from "vue";
+import { useRoute } from "vue-router";
+import Side from "./Side/index.vue";
+import Headers from "./Header.vue";
 export default defineComponent({
   components: {
     LaptopOutlined,
@@ -37,7 +43,38 @@ export default defineComponent({
   },
 
   setup() {
-    return {};
+    const route = useRoute();
+
+    const state = reactive({
+      list: [],
+      name: "",
+    });
+
+    const getBreadCrumb = () => {
+      state.list = [];
+      state.name = route.name;
+      let matched = route.matched;
+      matched.forEach((item) => {
+        state.list.push(item);
+      });
+
+      console.log(state.list,state.name);
+    };
+
+    onMounted(() => {
+      getBreadCrumb();
+    });
+
+    watch(
+      () => route.matched,
+      () => {
+        getBreadCrumb();
+      }
+    );
+
+    return {
+      ...toRefs(state),
+    };
   },
 });
 </script>
