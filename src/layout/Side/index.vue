@@ -1,3 +1,4 @@
+/* eslint-disable semi */
 <template>
   <a-layout-sider width="200" style="background: #fff">
     <a-menu
@@ -9,8 +10,8 @@
       :style="{ height: '100%', borderRight: 0 }"
     >
       <side-item
-        v-for="route in list"
-        :key="route.name"
+        v-for="(route, index) in list"
+        :key="index"
         :item="route"
         :base-path="route.path"
       ></side-item>
@@ -19,10 +20,10 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, watch, computed } from "vue";
-import sideItem from "./SideItem.vue";
-import store from "@/store";
-import { useRoute, useRouter } from "vue-router";
+import { defineComponent, reactive, toRefs, watch } from 'vue';
+import sideItem from './SideItem.vue';
+import store from '@/store';
+import { useRoute, useRouter } from 'vue-router';
 export default defineComponent({
   setup() {
     const currentRoute = useRoute();
@@ -35,7 +36,7 @@ export default defineComponent({
       openKeys: [currentRoute.matched[0].name],
       selectedKeys: [currentRoute.name],
     });
-    // 点击菜单 
+    // 点击菜单
     const clickMenuItem = ({ key }) => {
       // 重复跳转
       if (key === currentRoute.name) return;
@@ -47,13 +48,18 @@ export default defineComponent({
       }
     };
 
-    watch(() => currentRoute.path,() => {
-      state.selectedKeys = [currentRoute.name]
-    })
+    watch(
+      () => currentRoute.path,
+      () => {
+        state.selectedKeys = [currentRoute.name];
+      },
+    );
 
-    //互斥 submenu 展开收起的回调
-    const onOpenChange = openKeys => {
-      const latestOpenKey = openKeys.find(key => state.openKeys.indexOf(key) === -1);
+    // 互斥 submenu 展开收起的回调
+    const onOpenChange = (openKeys) => {
+      const latestOpenKey = openKeys.find(
+        (key) => state.openKeys.indexOf(key) === -1,
+      );
       if (state.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
         state.openKeys = openKeys;
       } else {
@@ -66,11 +72,11 @@ export default defineComponent({
       currentRoute,
       ...toRefs(state),
       clickMenuItem,
-      onOpenChange
+      onOpenChange,
     };
   },
   components: {
-    "side-item": sideItem,
+    'side-item': sideItem,
   },
 });
 </script>

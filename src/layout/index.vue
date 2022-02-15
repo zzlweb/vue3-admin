@@ -7,11 +7,12 @@
         <a-breadcrumb style="margin: 16px 0">
           <a-breadcrumb-item v-for="(item, index) in list" :key="index">
             <router-link
-              v-if="true"
+              v-if="checkLength(item) && !item.redirect"
               :to="{ path: item.path === '' ? '/' : item.path }"
-              > 测试 </router-link
             >
-            <span v-else>{{ item.meta.title }}</span>
+              {{ item.name }}
+            </router-link>
+            <span v-else>{{ item.name }}</span>
           </a-breadcrumb-item>
         </a-breadcrumb>
         <a-layout-content
@@ -29,11 +30,18 @@
   </a-layout>
 </template>
 <script>
-import { LaptopOutlined, NotificationOutlined } from "@ant-design/icons-vue";
-import { defineComponent, onMounted, toRefs, watch, reactive } from "vue";
-import { useRoute } from "vue-router";
-import Side from "./Side/index.vue";
-import Headers from "./Header.vue";
+import { LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
+import {
+  defineComponent,
+  onMounted,
+  toRefs,
+  watch,
+  reactive,
+  computed,
+} from 'vue';
+import { useRoute } from 'vue-router';
+import Side from './Side/index.vue';
+import Headers from './Header.vue';
 export default defineComponent({
   components: {
     LaptopOutlined,
@@ -47,18 +55,18 @@ export default defineComponent({
 
     const state = reactive({
       list: [],
-      name: "",
+      name: '',
     });
 
     const getBreadCrumb = () => {
       state.list = [];
       state.name = route.name;
-      let matched = route.matched;
+      const matched = route.matched;
       matched.forEach((item) => {
         state.list.push(item);
       });
 
-      console.log(state.list,state.name);
+      console.log(state.list, state.name);
     };
 
     onMounted(() => {
@@ -69,11 +77,22 @@ export default defineComponent({
       () => route.matched,
       () => {
         getBreadCrumb();
-      }
+      },
     );
 
+    const checkLength = computed(() => {
+      return (params) => {
+        if (
+          params.children &&
+          params.children.filter((item) => !item.hidden).length < 2
+        ) {
+          return true;
+        }
+      };
+    });
     return {
       ...toRefs(state),
+      checkLength,
     };
   },
 });

@@ -1,7 +1,7 @@
 module.exports = {
   devServer: {
     open: true,
-    hot: true,
+    hot: true
   },
   // 关闭保存eslint 校验
   lintOnSave: false,
@@ -10,16 +10,16 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        vue$: 'vue/dist/vue.esm-bundler.js',
-      },
-    },
+        vue$: 'vue/dist/vue.esm-bundler.js'
+      }
+    }
   },
   // 解决 antd less 警告
   css: {
     loaderOptions: {
       less: {
-        javascriptEnabled: true,
-      },
-    },
-  },
-};
+        javascriptEnabled: true
+      }
+    }
+  }
+}

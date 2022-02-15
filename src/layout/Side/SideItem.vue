@@ -16,7 +16,7 @@
 <script>
 // import { defineComponent, ref } from "vue";
 const SubMenu = {
-  name: "SubMenu",
+  name: 'SubMenu',
   props: {
     menuInfo: {
       type: Object,
@@ -31,7 +31,7 @@ const SubMenu = {
           <a-menu-item :key="route.name">
             {{ route.name }}
           </a-menu-item>
-        </template> 
+        </template>
         <template v-else>
           <sub-menu :menu-info="route" :key="route.name" />
         </template>
@@ -65,16 +65,16 @@ export default {
   },
   props: {
     item: {
-      type: Object, 
+      type: Object,
       require: true,
     },
     basePath: {
       type: String,
-      default: "",
+      default: '',
     },
   },
   components: {
-    "sub-menu": SubMenu,
+    'sub-menu': SubMenu,
   },
 };
 </script>
