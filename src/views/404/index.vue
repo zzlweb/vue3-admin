@@ -1,21 +1,29 @@
 <template>
   <div className="nothing-page flex-row">
-      <img className="run-img" src='@/assets/images/web404.svg' />
-      <div className="right-info">
-        <h1>
-          Oops！Error <span>404</span>…
-        </h1>
-        <p>We are sorry , the page you resquested cannot be found.</p>
-      </div>
+    <img className="run-img" src="@/assets/images/web404.svg" />
+    <div className="right-info">
+      <h1>Oops！Error <span>404</span>…</h1>
+      <p>We are sorry , the page you resquested cannot be found.</p>
+      <a-button type="primary" @click="GoHome">返回首页</a-button>
     </div>
+  </div>
 </template>
 
 <script>
-export default {
+import { defineComponent } from "vue";
+import { useRouter } from "vue-router";
+export default defineComponent({
   setup() {
-    
+    const router = useRouter()
+    const GoHome = () => {
+      router.push({path: '/'})
+    };
+
+    return {
+      GoHome,
+    };
   },
-}
+});
 </script>
 
 <style lang="less" scoped>
@@ -62,5 +70,4 @@ export default {
   height: 100%;
   justify-content: center;
 }
-
 </style>

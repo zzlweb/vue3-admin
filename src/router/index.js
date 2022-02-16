@@ -38,11 +38,6 @@ export const constantRoutes = [{
         component: () => import(/* webpackChunkName: "redirect" */ '@/views/redirect/index')
       }]
     },
-    {
-      path: '/:pathMatch(.*)',
-      component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
-      hidden: true
-    }
   ]
 },
 ...modules,
@@ -62,14 +57,12 @@ export const asyncRoutes = [
     redirect: '/pdf/index',
     name: 'PDF',
     meta:{
-      title: 'PDF'
+      title: 'PDF',
+      roles: ['admin']
     },
     children: [{
       path: 'index',
       name: 'PDF',
-      meta: {
-        roles: ['admin']
-      },
       component: () => import(/* webpackChunkName: "PDF" */ '@/views/PDF/index')
     }]
   },
@@ -80,22 +73,20 @@ export const asyncRoutes = [
     name: '权限页面',
     meta: {
       title: '权限页面',
+      roles: ['admin']
     },
     children: [{
       path: 'index',
       name: '权限页面',
-      meta: {
-        title: '权限页面',
-        roles: ['editor']
-      },
       component: () => import(/* webpackChunkName: "permission" */'@/views/Permission/index')
     }]
-  }, {
+  },
+  {
     path: '/:pathMatch(.*)',
     name: '404',
     component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
     hidden: true
-  }
+  } 
 ]
 
 const router = createRouter({

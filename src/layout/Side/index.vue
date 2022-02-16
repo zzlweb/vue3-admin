@@ -1,6 +1,4 @@
-/* eslint-disable semi */
 <template>
-  <a-layout-sider width="200" style="background: #fff">
     <a-menu
       v-model:openKeys="openKeys"
       v-model:selectedKeys="selectedKeys"
@@ -16,7 +14,6 @@
         :base-path="route.path"
       ></side-item>
     </a-menu>
-  </a-layout-sider>
 </template>
 
 <script>
