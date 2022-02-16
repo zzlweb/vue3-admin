@@ -36,18 +36,21 @@ import {
   MenuFoldOutlined,
 } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
+import { useRouter, useRoute } from 'vue-router'
 import store from "@/store/index";
 export default defineComponent({
   props: {
     collapsed: Boolean
   },
   setup(props,{emit}) {
+    const router = useRouter()
+    const route = useRoute()
     const handleClick = async ({ key }) => {
       try {
         if (key === "1") {
           await store.dispatch("user/logout");
           message.success("退出登录成功！");
-          location.reload();
+          router.go(0)
         }
       } catch (error) {
         message.error("退出登录失败！");

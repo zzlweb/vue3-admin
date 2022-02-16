@@ -83,16 +83,19 @@ export default defineComponent({
       const { data } = res;
       try {
         if (data.code === 200) {
-        const toPath = route.query?.redirect || "/";
-        message.success("登录成功!");
-        router.replace(toPath)
-      } else {
-        message.error(data.message || "登录失败!");
-        formState.loading = false;
-        message.destroy();
-      }
+          let toPath = route.query?.redirect || "/";
+          if (["/permission/index", "/pdf/index"].indexOf(toPath) !== -1) {
+            toPath = "/";
+          }
+          message.success("登录成功!");
+          router.replace(toPath);
+        } else {
+          message.error(data.message || "登录失败!");
+          formState.loading = false;
+          message.destroy();
+        }
       } catch (error) {
-        store.dispatch('user/resetToken')
+        store.dispatch("user/resetToken");
         message.error("登录失败!");
         formState.loading = false;
         message.destroy();
