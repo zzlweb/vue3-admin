@@ -7,7 +7,7 @@
         <a-breadcrumb style="margin: 16px 0">
           <a-breadcrumb-item v-for="(item, index) in list" :key="index">
             <router-link
-              v-if="checkLength(item) && !item.redirect"
+              v-if="!item.redirect"
               :to="{ path: item.path === '' ? '/' : item.path }"
             >
               {{ item.name }}
@@ -30,7 +30,7 @@
   </a-layout>
 </template>
 <script>
-import { LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
+import { LaptopOutlined, NotificationOutlined } from "@ant-design/icons-vue";
 import {
   defineComponent,
   onMounted,
@@ -38,10 +38,10 @@ import {
   watch,
   reactive,
   computed,
-} from 'vue';
-import { useRoute } from 'vue-router';
-import Side from './Side/index.vue';
-import Headers from './Header.vue';
+} from "vue";
+import { useRoute } from "vue-router";
+import Side from "./Side/index.vue";
+import Headers from "./Header.vue";
 export default defineComponent({
   components: {
     LaptopOutlined,
@@ -55,7 +55,7 @@ export default defineComponent({
 
     const state = reactive({
       list: [],
-      name: '',
+      name: "",
     });
 
     const getBreadCrumb = () => {
@@ -66,7 +66,12 @@ export default defineComponent({
         state.list.push(item);
       });
 
-      console.log(state.list, state.name);
+      if (
+        state.list.length >= 2 &&
+        state.list[0].meta.title === state.list[1].name
+      ) {
+        state.list = state.list.splice(0, 1);
+      }
     };
 
     onMounted(() => {
@@ -77,7 +82,7 @@ export default defineComponent({
       () => route.matched,
       () => {
         getBreadCrumb();
-      },
+      }
     );
 
     const checkLength = computed(() => {

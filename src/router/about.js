@@ -6,6 +6,9 @@ const AboutRouter = {
   component: Layout,
   redirect: '/test/index',
   name: '测试',
+  meta: {
+    title: '测试'
+  },
   children: [{
     name: '测试页面',
     path: 'index',

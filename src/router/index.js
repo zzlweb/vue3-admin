@@ -20,14 +20,14 @@ export const constantRoutes = [{
   component: Layout,
   redirect: '/Home',
   name: '首页',
+  meta: {
+    title: '首页'
+  },
   children: [
     {
       path: '/Home',
       name: '首页',
       component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue'),
-      meta: {
-        title: '首页'
-      }
     },
     {
       path: '/redirect',
@@ -61,11 +61,13 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/pdf/index',
     name: 'PDF',
+    meta:{
+      title: 'PDF'
+    },
     children: [{
       path: 'index',
       name: 'PDF',
       meta: {
-        title: 'PDF',
         roles: ['admin']
       },
       component: () => import(/* webpackChunkName: "PDF" */ '@/views/PDF/index')
@@ -76,6 +78,9 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/permission/index',
     name: '权限页面',
+    meta: {
+      title: '权限页面',
+    },
     children: [{
       path: 'index',
       name: '权限页面',
