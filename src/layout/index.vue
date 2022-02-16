@@ -1,12 +1,12 @@
 <template>
-   <a-layout>
+  <a-layout>
     <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
       <div class="logo-area flex-row">Vue Admin</div>
       <side />
     </a-layout-sider>
     <a-layout>
-      <Headers :collapsed="collapsed" @changeCollapsed="changeCollapsed"/>
-       <a-layout-content style="padding: 0 24px 24px" class="flex-col">
+      <Headers :collapsed="collapsed" @changeCollapsed="changeCollapsed" />
+      <a-layout-content style="padding: 0 24px 24px" class="flex-col">
         <a-breadcrumb style="margin: 16px 0">
           <a-breadcrumb-item v-for="(item, index) in list" :key="index">
             <router-link
@@ -33,7 +33,11 @@
   </a-layout>
 </template>
 <script>
-import { UserOutlined, VideoCameraOutlined, UploadOutlined } from "@ant-design/icons-vue";
+import {
+  UserOutlined,
+  VideoCameraOutlined,
+  UploadOutlined,
+} from "@ant-design/icons-vue";
 import {
   defineComponent,
   onMounted,
@@ -47,7 +51,9 @@ import Side from "./Side/index.vue";
 import Headers from "./Header.vue";
 export default defineComponent({
   components: {
-    UserOutlined, VideoCameraOutlined, UploadOutlined,
+    UserOutlined,
+    VideoCameraOutlined,
+    UploadOutlined,
     Side,
     Headers,
   },
@@ -58,7 +64,7 @@ export default defineComponent({
     const state = reactive({
       list: [],
       name: "",
-      collapsed: false
+      collapsed: false,
     });
 
     const getBreadCrumb = () => {
@@ -75,11 +81,16 @@ export default defineComponent({
       ) {
         state.list = state.list.splice(0, 1);
       }
+
+      // 过滤首页
+      if (!state.list.some((item) => item.name === "首页")) {
+        state.list.unshift({ name: "首页", path: "/" });
+      }
     };
 
     const changeCollapsed = () => {
-      state.collapsed = !state.collapsed
-    }
+      state.collapsed = !state.collapsed;
+    };
 
     onMounted(() => {
       getBreadCrumb();
@@ -105,13 +116,13 @@ export default defineComponent({
     return {
       ...toRefs(state),
       checkLength,
-      changeCollapsed
+      changeCollapsed,
     };
   },
 });
 </script>
 <style lang="less">
-@import '../styles/antd.less';
+@import "../styles/antd.less";
 
 #components-layout-demo-top-side-2 .logo {
   float: left;
@@ -130,7 +141,7 @@ export default defineComponent({
   background: #fff;
 }
 
-.logo-area{
+.logo-area {
   width: 100%;
   height: 64px;
   background-image: linear-gradient(60deg, #64b3f4 0%, #c2e59c 100%);
