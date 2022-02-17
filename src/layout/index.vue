@@ -7,17 +7,17 @@
     <a-layout>
       <Headers :collapsed="collapsed" @changeCollapsed="changeCollapsed" />
       <a-layout-content style="padding: 0 24px 24px" class="flex-col">
-        <a-breadcrumb style="margin: 16px 0">
-          <a-breadcrumb-item v-for="(item, index) in list" :key="index">
-            <router-link
-              v-if="!item.redirect"
-              :to="{ path: item.path === '' ? '/' : item.path }"
-            >
-              {{ item.name }}
-            </router-link>
-            <span v-else>{{ item.name }}</span>
-          </a-breadcrumb-item>
-        </a-breadcrumb>
+          <a-breadcrumb style="margin: 16px 0">
+            <a-breadcrumb-item v-for="(item, index) in list" :key="index">
+              <router-link
+                v-if="!item.redirect"
+                :to="{ path: item.path === '' ? '/' : item.path }"
+              >
+                {{ item.name }}
+              </router-link>
+              <span v-else>{{ item.name }}</span>
+            </a-breadcrumb-item>
+          </a-breadcrumb>
         <a-layout-content
           :style="{
             background: '#fff',
@@ -75,6 +75,7 @@ export default defineComponent({
         state.list.push(item);
       });
 
+      // 如果匹配到的路由不小于2个, 并且匹配到的第一个和第二个重复,删除第一个
       if (
         state.list.length >= 2 &&
         state.list[0].meta.title === state.list[1].name
@@ -103,19 +104,8 @@ export default defineComponent({
       }
     );
 
-    const checkLength = computed(() => {
-      return (params) => {
-        if (
-          params.children &&
-          params.children.filter((item) => !item.hidden).length < 2
-        ) {
-          return true;
-        }
-      };
-    });
     return {
       ...toRefs(state),
-      checkLength,
       changeCollapsed,
     };
   },
