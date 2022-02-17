@@ -24,7 +24,3 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### task
-
-#### 封装侧边栏
-
-#### 路由跳转误匹配

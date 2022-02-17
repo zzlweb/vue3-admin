@@ -70,8 +70,8 @@ import {
   FullscreenExitOutlined,
 } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import { useRouter, useRoute } from "vue-router";
-import { ref, reactive ,onBeforeUnmount} from "vue";
+import { useRouter } from "vue-router";
+import { ref, onBeforeUnmount } from "vue";
 import screenfull from "screenfull";
 import store from "@/store/index";
 export default defineComponent({
@@ -107,13 +107,11 @@ export default defineComponent({
     const ToggleShowFullScreen = () => {
       if (!screenfull.enabled) {
         message.info({
-          message: 'you browser can not work',
-          type: 'warning'
-        })
+          message: "you browser can not work",
+          type: "warning",
+        });
         return false;
       }
-
-      console.log(111);
       screenfull.toggle();
     };
 
@@ -192,6 +190,6 @@ export default defineComponent({
 }
 
 .right-part .full-screen {
-  margin-right: 30px;
+  margin-right: 25px;
 }
 </style>
