@@ -21,5 +21,14 @@ module.exports = {
         javascriptEnabled: true
       }
     }
+  },
+  // 添加插件
+  chainWebpack(config) {
+    if (process.env.NODE_ENV === 'production') {
+      // 大文件可视化分析插件
+      config.plugin('webpack-bundle-analyzer')
+        .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
+        .end()
+    }
   }
 }
