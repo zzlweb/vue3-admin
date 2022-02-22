@@ -17,7 +17,9 @@ import {
   Carousel, 
   Layout, 
   Breadcrumb, 
-  Tooltip
+  Tooltip,
+  Table,
+  Popconfirm
 } from 'ant-design-vue'
 
 /**
@@ -46,4 +48,6 @@ export default function loadComponent(app) {
   app.use(Layout)
   app.use(Breadcrumb)
   app.use(Tooltip)
+  app.use(Table)
+  app.use(Popconfirm)
 }
