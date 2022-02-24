@@ -12,40 +12,14 @@
     :columns="columns"
     :row-key="(record) => record.id"
   >
-    <template #bodyCell="{ column, text, record }">
-      <template v-if="column.dataIndex === 'name'">
-        <div class="editable-cell">
-          <div
-            v-if="editableData[record.key]"
-            class="editable-cell-input-wrapper"
-          >
-            <a-input
-              v-model:value="editableData[record.key].name"
-              @pressEnter="save(record.key)"
-            />
-            <check-outlined
-              class="editable-cell-icon-check"
-              @click="save(record.key)"
-            />
-          </div>
-          <div v-else class="editable-cell-text-wrapper">
-            {{ text || " " }}
-            <edit-outlined
-              class="editable-cell-icon"
-              @click="edit(record.key)"
-            />
-          </div>
-        </div>
-      </template>
-      <template v-else-if="column.dataIndex === 'operation'">
-        <a-popconfirm
-          v-if="dataSource.length"
-          title="确定要删除吗?"
-          @confirm="onDelete(record.key)"
-        >
-          <a>删除</a>
-        </a-popconfirm>
-      </template>
+    <template #operation="{ record }">
+      <a-popconfirm
+        v-if="dataSource.length"
+        title="Sure to delete?"
+        @confirm="onDelete(record.id)"
+      >
+        <a>Delete</a>
+      </a-popconfirm>
     </template>
   </a-table>
 </template>
@@ -76,48 +50,52 @@ export default defineComponent({
   setup() {
     const columns = [
       {
-        title: "name",
+        title: "姓名",
         dataIndex: "name",
-        width: "20%",
       },
       {
-        title: "sex",
+        title: "性别",
         dataIndex: "sex",
       },
       {
-        title: "age",
+        title: "年龄",
+        width: "10%",
         dataIndex: "age",
       },
       {
-        title: "birth",
+        title: "生日",
         dataIndex: "birth",
       },
       {
-        title: "address",
+        title: "地址",
+        ellipsis: true,
+        width: "30%",
         dataIndex: "address",
       },
       {
-        title: "operation",
+        title: "操作",
+        width: "15%",
+        slots: {
+          customRender: "operation",
+        },
         dataIndex: "operation",
       },
     ];
     const dataSource = ref([]);
-    const count = computed(() => dataSource.value.length + 1);
     const editableData = reactive({});
     const loading = ref(false);
 
     onMounted(async () => {
       loading.value = true;
 
-       const dataList = await useGetData()
+      const dataList = await useGetData();
 
-       dataList.list.forEach(item => {
-         item.sex === 0 ? item.sex = '女' :  item.sex = '男'
-       });
+      dataList.list.forEach((item) => {
+        item.sex === 0 ? (item.sex = "女") : (item.sex = "男");
+      });
 
-       dataSource.value = dataList.list
-
-       loading.value = false
+      dataSource.value = dataList.list;
+      loading.value = false;
     });
 
     const edit = (key) => {
@@ -149,7 +127,6 @@ export default defineComponent({
       handleAdd,
       dataSource,
       editableData,
-      count,
       edit,
       save,
     };
