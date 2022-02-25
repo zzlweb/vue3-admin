@@ -1,7 +1,8 @@
 import http from '@/utils/http/axios'
 
 const Api = {
-  getData: '/Excel/getData'
+  getData: '/Excel/getData',
+  addData: '/Excel/add'
 }
 
 /**
@@ -12,5 +13,16 @@ export function getData(params) {
     url: Api.getData,
     method: 'GET',
     params
+  })
+}
+
+/**
+ * @description:添加表格数据
+ */
+ export function addData(params) {
+  return http({
+    url: Api.addData,
+    method: 'post',
+    data: {...params}
   })
 }

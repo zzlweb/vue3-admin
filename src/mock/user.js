@@ -59,10 +59,11 @@ export default {
    * @param name, addr, age, birth, sex
    * @return {{code: number, data: {message: string}}}
    */
-  createUser: config => {
+  addDataList: config => {
+    console.log(config);
     const {
       name,
-      addr,
+      address,
       age,
       birth,
       sex
@@ -71,7 +72,7 @@ export default {
     List.unshift({
       id: Mock.Random.guid(),
       name: name,
-      addr: addr,
+      address: address,
       age: age,
       birth: birth,
       sex: sex

@@ -19,7 +19,8 @@ import {
   Breadcrumb, 
   Tooltip,
   Table,
-  Popconfirm
+  Popconfirm,
+  Drawer
 } from 'ant-design-vue'
 
 /**
@@ -50,4 +51,5 @@ export default function loadComponent(app) {
   app.use(Tooltip)
   app.use(Table)
   app.use(Popconfirm)
+  app.use(Drawer)
 }
