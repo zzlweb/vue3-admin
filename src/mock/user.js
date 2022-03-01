@@ -78,7 +78,7 @@ export default {
       sex: sex
     })
     return {
-      code: 20000,
+      code: 200,
       data: {
         message: '添加成功'
       }

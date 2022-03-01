@@ -1,7 +1,7 @@
 <template>
   <a-layout>
     <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
-      <div class="logo-area flex-row">Vue Admin</div>
+      <div class="logo-area flex-row">Vue3 Admin</div>
       <side />
     </a-layout-sider>
     <a-layout>
@@ -23,9 +23,9 @@
             background: '#fff',
             padding: '24px',
             margin: 0,
-            overflow: 'hidden',
             minHeight: '280px',
           }"
+          class="content-area"
         >
           <router-view></router-view>
         </a-layout-content>
@@ -142,5 +142,10 @@ export default defineComponent({
   font-size: 20px;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.content-area{
+  overflow-y: auto;
+  height: 100%;
 }
 </style>

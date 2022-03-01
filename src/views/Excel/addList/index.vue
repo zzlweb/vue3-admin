@@ -8,45 +8,34 @@
     :get-container="false"
     :wrap-style="{ position: 'absolute' }"
   >
-    <a-form :model="form" :rules="rules" layout="vertical">
+    <a-form :model="form" :rules="rules" layout="vertical" ref="formRef">
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="姓名" name="name">
-            <a-input
-              v-model:value="form.name"
-              placeholder="Please enter user name"
-            />
+            <a-input v-model:value="form.name" placeholder="请输入用户名" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="性别" name="owner">
-            <a-select
-              placeholder="Please a-s an owner"
-              v-model:value="form.owner"
-            >
-              <a-select-option value="xiao">Xiaoxiao Fu</a-select-option>
-              <a-select-option value="mao">Maomao Zhou</a-select-option>
+          <a-form-item label="性别" name="sex">
+            <a-select placeholder="请选择性别" v-model:value="form.sex">
+              <a-select-option value="男">男</a-select-option>
+              <a-select-option value="女">女</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
       </a-row>
       <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-item label="年龄" name="type">
-            <a-select
-              placeholder="Please choose the type"
-              v-model:value="form.type"
-            >
-              <a-select-option value="private">Private</a-select-option>
-              <a-select-option value="public">Public</a-select-option>
-            </a-select>
+          <a-form-item label="年龄" name="age">
+            <a-input v-model:value="form.age" placeholder="请输入年龄" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="生日" name="dateTime">
+          <a-form-item label="出生日期" name="birth">
             <a-date-picker
-              v-model:value="form.dateTime"
+              v-model:value="form.birth"
               style="width: 100%"
+              placeholder="选择出生日期"
               :get-popup-container="(trigger) => trigger.parentNode"
             />
           </a-form-item>
@@ -54,11 +43,11 @@
       </a-row>
       <a-row :gutter="16">
         <a-col :span="24">
-          <a-form-item label="地址" name="description">
+          <a-form-item label="地址" name="address">
             <a-textarea
-              v-model:value="form.description"
+              v-model:value="form.address"
               :rows="4"
-              placeholder="please enter url description"
+              placeholder="请输入地址"
             />
           </a-form-item>
         </a-col>
@@ -77,14 +66,18 @@
         zIndex: 1,
       }"
     >
-      <a-button style="margin-right: 8px" @click="onClose">Cancel</a-button>
-      <a-button type="primary" @click="onClose">Submit</a-button>
+      <a-button style="margin-right: 8px" @click="onClose">取消</a-button>
+      <a-button type="primary" @click="onSubmit">提交</a-button>
     </div>
   </a-drawer>
 </template>
 <script>
+import moment from 'moment';
 import { PlusOutlined } from "@ant-design/icons-vue";
 import { defineComponent, reactive, ref } from "vue";
+import { addData } from "@/api/Excel";
+import { message } from "ant-design-vue";
+
 export default defineComponent({
   components: {
     PlusOutlined,
@@ -97,70 +90,123 @@ export default defineComponent({
   },
 
   setup(props, { emit }) {
+    const formRef = ref();
+    const dateFormat = 'YYYY/MM/DD';
     const form = reactive({
       name: "",
-      url: "",
-      owner: "",
-      type: "",
-      approver: "",
-      dateTime: "",
-      description: "",
+      sex: "",
+      age: "",
+      birth: '',
+      address: "",
     });
+
+    let checkName = async (rule, value) => {
+      let reg = /^[\u4e00-\u9fa5]{2,6}$/;
+      if (value === "") {
+        return Promise.reject("请输入用户名");
+      } else if (!reg.test(value)) {
+        return Promise.reject("请输入2~6位中文");
+      } else {
+        Promise.resolve();
+      }
+    };
+
+    let checkAge = async (rule, value) => {
+      let reg = /^(?:[1-9][0-9]?|1[01][0-9]|120)$/; //年龄是1-120之间有效
+      if (value === "") {
+        return Promise.reject("请输入年龄");
+      } else if (!reg.test(value)) {
+        return Promise.reject("请输入合法年龄");
+      } else {
+        Promise.resolve();
+      }
+    };
+
+    let checkAddress = async (rule, value) => {
+      if (value === "") {
+        return Promise.reject("请输入地址");
+      } else {
+        Promise.resolve();
+      }
+    };
+
     const rules = {
       name: [
         {
           required: true,
-          message: "Please enter user name",
+          validator: checkName,
+          trigger: "change",
         },
       ],
-      url: [
+      sex: [
         {
           required: true,
-          message: "please enter url",
+          message: "请选择性别",
         },
       ],
-      owner: [
+      age: [
         {
           required: true,
-          message: "Please select an owner",
+          validator: checkAge,
+          trigger: "change",
         },
       ],
-      type: [
+      birth: [
         {
           required: true,
-          message: "Please choose the type",
+          message: "选择出生日期",
         },
       ],
-      approver: [
+      address: [
         {
           required: true,
-          message: "Please choose the approver",
-        },
-      ],
-      dateTime: [
-        {
-          required: true,
-          message: "Please choose the dateTime",
-          type: "object",
-        },
-      ],
-      description: [
-        {
-          required: true,
-          message: "Please enter url description",
+          validator: checkAddress,
+          trigger: "change",
+          message: "请输入地址",
         },
       ],
     };
 
     const onClose = () => {
+      formRef.value.resetFields()
       emit("closeDraw");
     };
+
+    const onSubmit = () => {
+      formRef.value
+        .validate()
+        .then(() => {
+          form.birth = moment(form.birth, dateFormat)
+          addData(form).then((res) => {
+            if(res.code === 200 ){
+              // 添加成功
+              message.destroy()
+              message.success('添加成功')
+              emit("closeDraw");
+            }
+          })
+        })
+        .catch((error) => {
+          message.destroy()
+          message.error('校验失败')
+        });
+    }
 
     return {
       form,
       rules,
       onClose,
+      formRef,
+      onSubmit
     };
   },
 });
 </script>
+
+<style lang="less" scoped>
+.ant-form-item textarea.ant-input {
+  resize: none;
+  padding: 8px 10px;
+  overflow-y: auto;
+}
+</style>

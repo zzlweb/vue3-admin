@@ -190,9 +190,7 @@ export default defineComponent({
 
 .export-table {
   height: 100%;
-  overflow: hidden;
   position: relative;
-  width: '100%',
 }
 
 .ant-table td {
