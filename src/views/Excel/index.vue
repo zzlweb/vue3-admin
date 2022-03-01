@@ -1,12 +1,28 @@
 <template>
   <div class="flex-col export-table">
-    <a-button
-      class="editable-add-btn"
-      style="margin-bottom: 8px"
-      @click="handleAdd"
-      type="primary"
-      >添加</a-button
-    >
+    <div class="flex-row config-box">
+      <div class="flex-row" style="align-items:center">
+        <FilenameOption v-model="fileName" />
+        <auto-width-option v-model="autoWidth" />
+        <book-type-option v-model="bookType" />
+      </div>
+      <div class="flex-row" style="align-items:center">
+        <a-button
+          class="editable-add-btn"
+          style="margin-bottom: 8px"
+          @click="handelExport"
+          type="ghost"
+          >导出表格</a-button
+        >
+        <a-button
+          class="editable-add-btn"
+          style="margin-bottom: 8px; margin-left: 8px"
+          @click="handleAdd"
+          type="primary"
+          >添加</a-button
+        >
+      </div>
+    </div>
     <a-table
       class="fill"
       bordered
@@ -33,14 +49,18 @@
   </div>
 
   <!-- 右侧抽屉 添加数据 -->
-  <add-list :visible="visible"  @closeDraw ="closeDraw"></add-list>
+  <add-list :visible="visible" @closeDraw="closeDraw"></add-list>
 </template>
 <script>
 import { computed, defineComponent, reactive, ref, onMounted } from "vue";
 import { CheckOutlined, EditOutlined } from "@ant-design/icons-vue";
+import AutoWidthOption from "./components/AutoWidthOption.vue";
+import BookTypeOption from "./components/BookTypeOption.vue";
+import FilenameOption from "./components/FilenameOption.vue";
 import { cloneDeep } from "lodash-es";
 import { getData } from "@/api/Excel";
-import AddList from './addList'
+import AddList from "./addList";
+
 // 获取表格数据
 const useGetData = function (pageNumber, pageSize) {
   return new Promise((resolve, reject) => {
@@ -58,10 +78,14 @@ export default defineComponent({
   components: {
     CheckOutlined,
     EditOutlined,
-    AddList
+    AddList,
+    AutoWidthOption,
+    BookTypeOption,
+    FilenameOption,
   },
 
   setup() {
+    // 表头数据
     const columns = [
       {
         title: "姓名",
@@ -107,7 +131,18 @@ export default defineComponent({
     const loading = ref(false);
 
     // 是否显示抽屉
-    const visible = ref(false)
+    const visible = ref(false);
+
+    // 导出表格设置的文件名
+    const fileName = ref("");
+
+    // 导出的表格是否自适应宽度
+    const autoWidth = ref(true);
+
+    // 导出的文件类型
+    const bookType = ref("xlsx");
+
+    const downloadLoading =  ref(false)
 
     // 获取数据
     const getDataList = async (current, limit) => {
@@ -144,12 +179,12 @@ export default defineComponent({
 
     const handleAdd = () => {
       // 显示抽屉
-      visible.value = true
+      visible.value = true;
     };
 
     const closeDraw = () => {
-      visible.value = false 
-    }
+      visible.value = false;
+    };
 
     // 分页设置
     const pagination = computed(() => ({
@@ -164,6 +199,25 @@ export default defineComponent({
       current.value = pageNumber;
       getDataList(pageNumber, pageSize);
     };
+
+    // 处理表单导出的逻辑
+    const handelExport = () => {
+      downloadLoading.value = true
+      import('@/vendor/Export2Excel').then(excel => {
+        // const tHeader = ['Id', 'Title', 'Author', 'Readings', 'Date']
+        // const filterVal = ['id', 'title', 'author', 'pageviews', 'display_time']
+        // const list = this.list
+        // const data = this.formatJson(filterVal, list)
+        // excel.export_json_to_excel({
+        //   header: tHeader,
+        //   data,
+        //   filename: this.filename,
+        //   autoWidth: this.autoWidth,
+        //   bookType: this.bookType
+        // })
+        // this.downloadLoading = false
+      })
+    }
 
     onMounted(() => {
       getDataList(current.value, limit.value);
@@ -181,13 +235,18 @@ export default defineComponent({
       pagination,
       handleChange,
       visible,
-      closeDraw
+      closeDraw,
+      fileName,
+      autoWidth,
+      bookType,
+      handelExport,
+      downloadLoading
     };
   },
 });
 </script>
-<style lang="less">
 
+<style lang="less">
 .export-table {
   height: 100%;
   position: relative;
@@ -235,10 +294,18 @@ export default defineComponent({
     width: 100px !important;
   }
 }
+
 .editable-add-btn.ant-btn {
   width: 100px !important;
 }
+
 .editable-cell:hover .editable-cell-icon {
   display: inline-block;
+}
+
+.config-box {
+  width: 100%;
+  justify-content: space-between;
+  align-content: center;
 }
 </style>

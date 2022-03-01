@@ -20,7 +20,8 @@ import {
   Tooltip,
   Table,
   Popconfirm,
-  Drawer
+  Drawer,
+  Radio
 } from 'ant-design-vue'
 
 /**
@@ -52,4 +53,5 @@ export default function loadComponent(app) {
   app.use(Table)
   app.use(Popconfirm)
   app.use(Drawer)
+  app.use(Radio)
 }

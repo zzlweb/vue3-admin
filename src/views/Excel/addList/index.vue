@@ -209,4 +209,8 @@ export default defineComponent({
   padding: 8px 10px;
   overflow-y: auto;
 }
+
+.ant-btn {
+  width: 100px;
+}
 </style>
