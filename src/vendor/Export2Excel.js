@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { saveAs } from 'file-saver'
-import XLSX from 'xlsx'
+import * as XLSX from 'xlsx'
 
 function generateArray(table) {
   var out = [];
@@ -154,7 +154,7 @@ export function export_json_to_excel({
   bookType = 'xlsx'
 } = {}) {
   /* original data */
-  filename = filename || 'excel-list'
+  filename = filename || 'excel'
   data = [...data]
   data.unshift(header);
 

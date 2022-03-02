@@ -1,58 +1,60 @@
 <template>
-  <div class="flex-col export-table">
-    <div class="flex-row config-box">
-      <div class="flex-row" style="align-items:center">
-        <FilenameOption v-model="fileName" />
-        <auto-width-option v-model="autoWidth" />
-        <book-type-option v-model="bookType" />
+  <a-spin tip="Loading..." :spinning="downloadLoading">
+    <div class="flex-col export-table">
+      <div class="flex-row config-box">
+        <div class="flex-row" style="align-items: center">
+          <FilenameOption v-model:value="fileName" />
+          <auto-width-option v-model:value="autoWidth" />
+          <book-type-option v-model:value="bookType" />
+        </div>
+        <div class="flex-row" style="align-items: center">
+          <a-button
+            class="editable-add-btn"
+            style="margin-bottom: 8px"
+            @click="handelExport"
+            type="ghost"
+            >导出表格</a-button
+          >
+          <a-button
+            class="editable-add-btn"
+            style="margin-bottom: 8px; margin-left: 8px"
+            @click="handleAdd"
+            type="primary"
+            >添加</a-button
+          >
+        </div>
       </div>
-      <div class="flex-row" style="align-items:center">
-        <a-button
-          class="editable-add-btn"
-          style="margin-bottom: 8px"
-          @click="handelExport"
-          type="ghost"
-          >导出表格</a-button
-        >
-        <a-button
-          class="editable-add-btn"
-          style="margin-bottom: 8px; margin-left: 8px"
-          @click="handleAdd"
-          type="primary"
-          >添加</a-button
-        >
-      </div>
+      <a-table
+        class="fill"
+        bordered
+        :data-source="dataSource"
+        :loading="loading"
+        :columns="columns"
+        :pagination="pagination"
+        :row-key="(record) => record.id"
+        @change="handleChange"
+        :scroll="{ y: 700 }"
+      >
+        <template #operation="{ record }">
+          <a-popconfirm
+            v-if="dataSource.length"
+            title="确定要删除?"
+            okText="确定"
+            cancelText="取消"
+            @confirm="onDelete(record.id)"
+          >
+            <a>删除</a>
+          </a-popconfirm>
+        </template>
+      </a-table>
     </div>
-    <a-table
-      class="fill"
-      bordered
-      :data-source="dataSource"
-      :loading="loading"
-      :columns="columns"
-      :pagination="pagination"
-      :row-key="(record) => record.id"
-      @change="handleChange"
-      :scroll="{ y: 700 }"
-    >
-      <template #operation="{ record }">
-        <a-popconfirm
-          v-if="dataSource.length"
-          title="确定要删除?"
-          okText="确定"
-          cancelText="取消"
-          @confirm="onDelete(record.id)"
-        >
-          <a>删除</a>
-        </a-popconfirm>
-      </template>
-    </a-table>
-  </div>
+  </a-spin>
 
   <!-- 右侧抽屉 添加数据 -->
   <add-list :visible="visible" @closeDraw="closeDraw"></add-list>
 </template>
 <script>
-import { computed, defineComponent, reactive, ref, onMounted } from "vue";
+import { computed, defineComponent, reactive, ref, onMounted, toRefs } from "vue";
 import { CheckOutlined, EditOutlined } from "@ant-design/icons-vue";
 import AutoWidthOption from "./components/AutoWidthOption.vue";
 import BookTypeOption from "./components/BookTypeOption.vue";
@@ -133,16 +135,16 @@ export default defineComponent({
     // 是否显示抽屉
     const visible = ref(false);
 
-    // 导出表格设置的文件名
-    const fileName = ref("");
+    const fileState = reactive({
+      // 导出表格设置的文件名
+      fileName: "",
+      // 导出的表格是否自适应宽度
+      autoWidth: true,
+      // 导出的文件类型
+      bookType: "xlsx",
+    });
 
-    // 导出的表格是否自适应宽度
-    const autoWidth = ref(true);
-
-    // 导出的文件类型
-    const bookType = ref("xlsx");
-
-    const downloadLoading =  ref(false)
+    const downloadLoading = ref(false);
 
     // 获取数据
     const getDataList = async (current, limit) => {
@@ -200,24 +202,39 @@ export default defineComponent({
       getDataList(pageNumber, pageSize);
     };
 
+    const formatJson = (filterVal, jsonData) => {
+      return jsonData.map((v) =>
+        filterVal.map((j) => {
+          if (j === "timestamp") {
+            return parseTime(v[j]);
+          } else {
+            return v[j];
+          }
+        })
+      );
+    };
+
     // 处理表单导出的逻辑
     const handelExport = () => {
-      downloadLoading.value = true
-      import('@/vendor/Export2Excel').then(excel => {
-        // const tHeader = ['Id', 'Title', 'Author', 'Readings', 'Date']
-        // const filterVal = ['id', 'title', 'author', 'pageviews', 'display_time']
-        // const list = this.list
-        // const data = this.formatJson(filterVal, list)
-        // excel.export_json_to_excel({
-        //   header: tHeader,
-        //   data,
-        //   filename: this.filename,
-        //   autoWidth: this.autoWidth,
-        //   bookType: this.bookType
-        // })
-        // this.downloadLoading = false
-      })
-    }
+      downloadLoading.value = true;
+      import("@/vendor/Export2Excel").then((excel) => {
+        const tHeader = ["姓名", "性别", "年龄", "生日", "地址"];
+        const filterVal = ["name", "sex", "age", "birth", "address"];
+        const list = dataSource.value;
+        const filename = fileState.fileName;
+        const autoWidth = fileState.autoWidth;
+        const bookType = fileState.bookType;
+        const data = formatJson(filterVal, list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: filename,
+          autoWidth: autoWidth,
+          bookType: bookType,
+        });
+        downloadLoading.value = false;
+      });
+    };
 
     onMounted(() => {
       getDataList(current.value, limit.value);
@@ -236,11 +253,9 @@ export default defineComponent({
       handleChange,
       visible,
       closeDraw,
-      fileName,
-      autoWidth,
-      bookType,
       handelExport,
-      downloadLoading
+      downloadLoading,
+      ...toRefs(fileState)
     };
   },
 });
@@ -290,7 +305,6 @@ export default defineComponent({
   }
 
   .editable-add-btn.ant-btn {
-    margin-bottom: 8px;
     width: 100px !important;
   }
 }
@@ -307,5 +321,6 @@ export default defineComponent({
   width: 100%;
   justify-content: space-between;
   align-content: center;
+  height: 50px;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div style="display:inline-block;">
     <label class="radio-label">文件类型: </label>
-    <a-select v-model="bookType" style="width:120px;">
+    <a-select v-model:value="bookType" style="width:120px;">
       <a-select-option
         v-for="item in options"
         :key="item"
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 export default {
   props: {
@@ -24,7 +24,7 @@ export default {
     }
   },
   setup(props, {emit}) {
-    const options = ['xlsx', 'csv', 'txt']
+    const options = ref(['xlsx', 'csv', 'txt'])
 
     const bookType = computed({
       get() {
@@ -32,7 +32,7 @@ export default {
       },
 
       set(val) {
-        emit('input', val)
+        emit('update:value', val)
       }
     })
 

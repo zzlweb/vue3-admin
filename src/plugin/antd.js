@@ -21,7 +21,8 @@ import {
   Table,
   Popconfirm,
   Drawer,
-  Radio
+  Radio, 
+  Spin
 } from 'ant-design-vue'
 
 /**
@@ -54,4 +55,5 @@ export default function loadComponent(app) {
   app.use(Popconfirm)
   app.use(Drawer)
   app.use(Radio)
+  app.use(Spin)
 }

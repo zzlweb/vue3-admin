@@ -1,9 +1,9 @@
 <template>
-  <div style="flex-row">
+  <div style="flex-row; margin-right: 10px">
     <span style="padding-left: 0">文件名: </span>
     <a-input
-      v-model="filename"
-      placeholder="请输入文件名(default excel-list)"
+      v-model:value="filename"
+      placeholder="请输入文件名(默认 excel)"
       style="width: 250px"
     />
   </div>
@@ -25,7 +25,7 @@ export default {
       },
 
       set(val) {
-        emit('input', val)
+        emit('update:value', val)
       }
     })
 

@@ -1,11 +1,11 @@
 <template>
   <div style="display:inline-block;">
     <label class="radio-label">设置自适应宽度: </label>
-    <a-radio-group v-model="autoWidth">
-      <a-radio value="true" >
+    <a-radio-group v-model:value="autoWidth">
+      <a-radio :value="true" >
         True
       </a-radio>
-      <a-radio value="false" >
+      <a-radio :value="false" >
         False
       </a-radio>
     </a-radio-group>
@@ -30,7 +30,7 @@ export default {
       },
 
       set(val) {
-        emit('input', val)
+        emit('update:value', val)
       }
     })
 
