@@ -1,6 +1,9 @@
 <template>
   <div class="container">
     <upload-excel  :before-upload="beforeUpload" :on-success="OnSuccess" />
+
+    <a-table :columns="tableHeader" :data-source="tableData" :row-key="(record) => record.id" >
+    </a-table>
   </div>
 </template>
 
@@ -20,6 +23,8 @@ export default {
     }
 
     const OnSuccess = ({ results, header }) => {
+      console.log(results, header)
+
       tableData.value = results
       tableHeader.value = header
     }

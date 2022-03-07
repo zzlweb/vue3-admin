@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input ref="InputRef" class="excel-upload-input" type="file" accept=".xlsx, .xls" @click="handleClick">
+    <input ref="InputRef" class="excel-upload-input" type="file" accept=".xlsx, .xls" @change="handleClick">
     <div class="drop" @drop="handleDrop" @dragover="handleDragover" @dragenter="handleDragover">
       Drop excel file here or
       <a-button :loading="loading" style="margin-left:16px;" type="primary" @click="handleUpload">
@@ -32,8 +32,6 @@ export default {
     const generateData = ({ header, results }) => {
       state.excelData.header = header
       state.excelData.results = results
-
-      console.log(header, results)
       props.onSuccess && props.onSuccess(state.excelData)
     }
 
