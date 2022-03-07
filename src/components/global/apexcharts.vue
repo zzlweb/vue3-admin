@@ -3,28 +3,28 @@
 </template>
 
 <script>
-import * as ApexCharts from "apexcharts";
-import { defineComponent, onMounted,nextTick } from "vue";
+import * as ApexCharts from 'apexcharts'
+import { defineComponent, onMounted, nextTick } from 'vue'
 export default defineComponent({
   props: {
     options: {
       type: Object,
-      required: true 
+      required: true
     }
-  }, 
-  setup(props) {
+  },
+  setup (props) {
     // 使用ref
     onMounted(() => {
-      var chartDom = document.querySelector("#chart");
+      var chartDom = document.querySelector('#chart')
 
-      var chart = new ApexCharts(chartDom, props.options);
+      var chart = new ApexCharts(chartDom, props.options)
 
       nextTick(() => {
-          chart.render()
+        chart.render()
       })
-    });
+    })
 
-    return {};
-  },
-});
+    return {}
+  }
+})
 </script>

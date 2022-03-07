@@ -15,11 +15,11 @@ const ExcelRouter = {
     meta: {
       title: '导出 Excel'
     },
-    component: () => import(/* webpackChunkName: "Excel" */ '@/views/Excel/index.vue')
+    component: () => import(/* webpackChunkName: "Excel" */ '@/views/Excel/ExportExcel.vue')
   }, {
     path: 'index2',
     name: '上传 Excel',
-    component: () => import(/* webpackChunkName: "ExcelUpload" */ '@/views/ExcelUpload/index.vue'),
+    component: () => import(/* webpackChunkName: "ExcelUpload" */ '@/views/Excel/ExcelUpload.vue'),
     meta: {
       title: '上传 Excel'
     }

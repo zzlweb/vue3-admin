@@ -23,13 +23,13 @@ export default {
     }
   },
 
-  setup(props, {emit}) {
+  setup (props, { emit }) {
     const autoWidth = computed({
-      get() {
+      get () {
         return props.value
       },
 
-      set(val) {
+      set (val) {
         emit('update:value', val)
       }
     })
@@ -37,6 +37,6 @@ export default {
     return {
       autoWidth
     }
-  },
+  }
 }
 </script>

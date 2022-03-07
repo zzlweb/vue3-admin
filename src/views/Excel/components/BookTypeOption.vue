@@ -23,15 +23,15 @@ export default {
       default: 'xlsx'
     }
   },
-  setup(props, {emit}) {
+  setup (props, { emit }) {
     const options = ref(['xlsx', 'csv', 'txt'])
 
     const bookType = computed({
-      get() {
+      get () {
         return props.value
       },
 
-      set(val) {
+      set (val) {
         emit('update:value', val)
       }
     })
@@ -40,6 +40,6 @@ export default {
       bookType,
       options
     }
-  },
+  }
 }
 </script>
