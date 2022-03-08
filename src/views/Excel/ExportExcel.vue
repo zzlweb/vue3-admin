@@ -10,14 +10,13 @@
         <div class="flex-row" style="align-items: center">
           <a-button
             class="editable-add-btn"
-            style="margin-bottom: 8px"
             @click="handelExport"
             type="ghost"
             >导出表格</a-button
           >
           <a-button
             class="editable-add-btn"
-            style="margin-bottom: 8px; margin-left: 8px"
+            style=" margin-left: 8px"
             @click="handleAdd"
             type="primary"
             >添加</a-button
