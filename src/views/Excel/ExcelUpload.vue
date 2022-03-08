@@ -1,9 +1,10 @@
 <template>
   <div class="container">
-    <upload-excel  :before-upload="beforeUpload" :on-success="OnSuccess" />
+    <upload-excel :before-upload="beforeUpload" :on-success="OnSuccess" />
 
-    <a-table :columns="tableHeader" :data-source="tableData" :row-key="(record) => record.id" >
-    </a-table>
+    <div style="margin-top: 20px">
+      <a-table :columns="tableHeader" v-show="tableData" :data-source="tableData" bordered :rowKey="(record,index)=>{return index}" />
+    </div>
   </div>
 </template>
 
@@ -23,10 +24,19 @@ export default {
     }
 
     const OnSuccess = ({ results, header }) => {
-      console.log(results, header)
+      const columns = []
+      for (const key in header) {
+        var item = {
+          title: header[key],
+          dataIndex: header[key],
+          key: header[key]
+        }
+
+        columns.push(item)
+      }
 
       tableData.value = results
-      tableHeader.value = header
+      tableHeader.value = columns
     }
 
     return {
@@ -37,4 +47,5 @@ export default {
     }
   }
 }
+
 </script>

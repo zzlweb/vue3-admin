@@ -1,7 +1,7 @@
 import Mock from 'mockjs'
 
 // get请求从config.url获取参数，post从config.body中获取参数
-function param2Obj(url) {
+function param2Obj (url) {
   const search = url.split('?')[1]
   if (!search) {
     return {}
@@ -9,9 +9,9 @@ function param2Obj(url) {
   return JSON.parse(
     '{"' +
     decodeURIComponent(search)
-    .replace(/"/g, '\\"')
-    .replace(/&/g, '","')
-    .replace(/=/g, '":"') +
+      .replace(/"/g, '\\"')
+      .replace(/&/g, '","')
+      .replace(/=/g, '":"') +
     '"}'
   )
 }
@@ -25,7 +25,7 @@ for (let i = 0; i < count; i++) {
       address: Mock.mock('@county(true)'),
       'age|18-60': 1,
       birth: Mock.Random.date(),
-      sex: Mock.Random.integer(0, 1),
+      sex: Mock.Random.integer(0, 1)
     })
   )
 }
@@ -60,7 +60,7 @@ export default {
    * @return {{code: number, data: {message: string}}}
    */
   addDataList: config => {
-    console.log(config);
+    console.log(config)
     const {
       name,
       address,
@@ -167,7 +167,7 @@ export default {
         data: {
           code: 200,
           token: 'vue-admin',
-          message: '登陆成功',
+          message: '登陆成功'
         }
       }
     } else if (username === 'editor' && password === 'editor') {
@@ -176,7 +176,7 @@ export default {
         data: {
           code: 200,
           token: 'vue-editor',
-          message: '登陆成功',
+          message: '登陆成功'
         }
       }
     } else {
@@ -190,7 +190,7 @@ export default {
     }
   },
   getInfo: config => {
-    const {params} = JSON.parse(config.body)
+    const { params } = JSON.parse(config.body)
 
     if (params === 'vue-admin') {
       return {

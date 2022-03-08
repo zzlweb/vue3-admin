@@ -2,9 +2,9 @@
   <div>
     <input ref="InputRef" class="excel-upload-input" type="file" accept=".xlsx, .xls" @change="handleClick">
     <div class="drop" @drop="handleDrop" @dragover="handleDragover" @dragenter="handleDragover">
-      Drop excel file here or
+      拖拽上传 or
       <a-button :loading="loading" style="margin-left:16px;" type="primary" @click="handleUpload">
-        Browse
+        点击上传
       </a-button>
     </div>
   </div>
@@ -12,6 +12,7 @@
 
 <script>
 import * as XLSX from 'xlsx'
+import { message } from 'ant-design-vue'
 import { ref, reactive, toRefs } from 'vue'
 export default {
   props: {
@@ -29,6 +30,12 @@ export default {
       }
     })
 
+    const handleDragover = (e) => {
+      e.stopPropagation()
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'copy'
+    }
+
     const generateData = ({ header, results }) => {
       state.excelData.header = header
       state.excelData.results = results
@@ -41,7 +48,8 @@ export default {
       let C
       const R = range.s.r
       /* start in the first row */
-      for (C = range.s.c; C <= range.e.c; ++C) { /* walk every column in the range */
+      for (C = range.s.c; C <= range.e.c; ++C) {
+        /* walk every column in the range */
         const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })]
         /* find the cell in the first row */
         let hdr = 'UNKNOWN ' + C // <-- replace with your desired default
@@ -55,11 +63,31 @@ export default {
       return /\.(xlsx|xls|csv)$/.test(file.name)
     }
 
+    const handleDrop = (e) => {
+      e.stopPropagation()
+      e.preventDefault()
+      if (state.loading) return
+      const files = e.dataTransfer.files
+      if (files.length !== 1) {
+        message.error('仅支持上传一个文件!')
+        return
+      }
+      const rawFile = files[0] // only use files[0]
+
+      if (!isExcel(rawFile)) {
+        message.error('仅支持 .xlsx, .xls, .csv 格式文件')
+        return false
+      }
+      upload(rawFile)
+      e.stopPropagation()
+      e.preventDefault()
+    }
+
     const readerData = (rawFile) => {
       state.loading = true
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
-        reader.onload = e => {
+        reader.onload = (e) => {
           const data = e.target.result
           const workbook = XLSX.read(data, { type: 'array' })
           const firstSheetName = workbook.SheetNames[0]
@@ -104,7 +132,9 @@ export default {
       InputRef,
       ...toRefs(state),
       handleUpload,
-      handleClick
+      handleClick,
+      handleDragover,
+      handleDrop
     }
   }
 }
