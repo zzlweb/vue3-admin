@@ -57,7 +57,7 @@ router.beforeEach(async (to, from, next) => {
           message.error('身份过期')
           // 判断to.path 是否为异步路由，如果为异步路由，redirect => 首页
           if (['/permission/index', '/pdf/index'].indexOf(to.path) !== -1) {
-            next(`/login?redirect=/`)
+            next('/login?redirect=/')
           } else {
             next(`/login?redirect=${to.path}`)
           }
@@ -74,7 +74,7 @@ router.beforeEach(async (to, from, next) => {
     } else {
       // other pages that do not have permission to access are redirected to the login page.
       if (['/permission/index', '/pdf/index'].indexOf(to.path) !== -1) {
-        next(`/login?redirect=/`)
+        next('/login?redirect=/')
       } else {
         next(`/login?redirect=${to.path}`)
       }

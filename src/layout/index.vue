@@ -35,82 +35,73 @@
 </template>
 <script>
 import {
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-} from "@ant-design/icons-vue";
-import {
   defineComponent,
   onMounted,
   toRefs,
   watch,
-  reactive,
-  computed,
-} from "vue";
-import { useRoute } from "vue-router";
-import Side from "./Side/index.vue";
-import Headers from "./Header.vue";
+  reactive
+} from 'vue'
+import { useRoute } from 'vue-router'
+import Side from './Side/index.vue'
+import Headers from './Header.vue'
 export default defineComponent({
   components: {
-    UserOutlined,
-    VideoCameraOutlined,
-    UploadOutlined,
     Side,
-    Headers,
+    Headers
   },
 
-  setup() {
-    const route = useRoute();
+  setup () {
+    const route = useRoute()
 
     const state = reactive({
       list: [],
-      name: "",
-      collapsed: false,
-    });
+      name: '',
+      collapsed: false
+    })
 
     const getBreadCrumb = () => {
-      state.list = [];
-      state.name = route.name;
-      const matched = route.matched;
+      state.list = []
+      state.name = route.name
+      const matched = route.matched
       matched.forEach((item) => {
-        state.list.push(item);
-      });
+        state.list.push(item)
+      })
 
       // 如果匹配到的路由不小于2个, 并且匹配到的第一个和第二个重复,删除第一个
       if (
         state.list.length >= 2 &&
         state.list[0].meta.title === state.list[1].name
       ) {
-        state.list = state.list.splice(0, 1);
+        state.list = state.list.splice(0, 1)
       }
 
       // 过滤首页
-      if (!state.list.some((item) => item.name === "首页")) {
-        state.list.unshift({ name: "首页", path: "/" });
+      if (!state.list.some((item) => item.name === '首页')) {
+        state.list.unshift({ name: '首页', path: '/' })
       }
-    };
+    }
 
     const changeCollapsed = () => {
-      state.collapsed = !state.collapsed;
-    };
+      state.collapsed = !state.collapsed
+    }
 
     onMounted(() => {
-      getBreadCrumb();
-    });
+      getBreadCrumb()
+    })
 
     watch(
       () => route.matched,
       () => {
-        getBreadCrumb();
+        getBreadCrumb()
       }
-    );
+    )
 
     return {
       ...toRefs(state),
-      changeCollapsed,
-    };
-  },
-});
+      changeCollapsed
+    }
+  }
+})
 </script>
 <style lang="less">
 @import "../styles/antd.less";

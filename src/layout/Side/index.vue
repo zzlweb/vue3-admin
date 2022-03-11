@@ -17,63 +17,63 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, watch } from 'vue';
-import sideItem from './SideItem.vue';
-import store from '@/store';
-import { useRoute, useRouter } from 'vue-router';
+import { defineComponent, reactive, toRefs, watch } from 'vue'
+import sideItem from './SideItem.vue'
+import store from '@/store'
+import { useRoute, useRouter } from 'vue-router'
 export default defineComponent({
-  setup() {
-    const currentRoute = useRoute();
-    const router = useRouter();
-    const list = store.getters.permissionRouter;
+  setup () {
+    const currentRoute = useRoute()
+    const router = useRouter()
+    const list = store.getters.permissionRouter
     // 获取当前打开的子菜单
     const state = reactive({
       rootSubmenuKeys: ['测试'],
       // 选择了name作为menu的key
       openKeys: [currentRoute.matched[0].name],
-      selectedKeys: [currentRoute.name],
-    });
+      selectedKeys: [currentRoute.name]
+    })
     // 点击菜单
     const clickMenuItem = ({ key }) => {
       // 重复跳转
-      if (key === currentRoute.name) return;
+      if (key === currentRoute.name) return
       // 如果是外链接
       if (/http(s)?:/.test(key)) {
-        window.open(key);
+        window.open(key)
       } else {
-        router.push({ name: key });
+        router.push({ name: key })
       }
-    };
+    }
 
     watch(
       () => currentRoute.path,
       () => {
-        state.selectedKeys = [currentRoute.name];
-      },
-    );
+        state.selectedKeys = [currentRoute.name]
+      }
+    )
 
     // 互斥 submenu 展开收起的回调
     const onOpenChange = (openKeys) => {
       const latestOpenKey = openKeys.find(
-        (key) => state.openKeys.indexOf(key) === -1,
-      );
+        (key) => state.openKeys.indexOf(key) === -1
+      )
       if (state.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-        state.openKeys = openKeys;
+        state.openKeys = openKeys
       } else {
-        state.openKeys = latestOpenKey ? [latestOpenKey] : [];
+        state.openKeys = latestOpenKey ? [latestOpenKey] : []
       }
-    };
+    }
 
     return {
       list,
       currentRoute,
       ...toRefs(state),
       clickMenuItem,
-      onOpenChange,
-    };
+      onOpenChange
+    }
   },
   components: {
-    'side-item': sideItem,
-  },
-});
+    'side-item': sideItem
+  }
+})
 </script>

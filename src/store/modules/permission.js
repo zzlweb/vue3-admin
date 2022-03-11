@@ -5,8 +5,8 @@ import { asyncRoutes, constantRoutes } from '@/router'
  * @param roles 用户权限
  * @param route 路由
  */
-// 
-function hasPermission(roles, route) {
+//
+function hasPermission (roles, route) {
   if (route.meta && route.meta.roles) {
     return roles.some(role => route.meta.roles.includes(role))
   } else {
@@ -19,7 +19,7 @@ function hasPermission(roles, route) {
  * @param routes asyncRoutes
  * @param roles  ['admin]
  */
-export function filterAsyncRoutes(routes, roles) {
+export function filterAsyncRoutes (routes, roles) {
   const res = []
   routes.forEach(route => {
     const tmp = { ...route }
@@ -48,7 +48,7 @@ const mutations = {
 }
 
 const actions = {
-  generateRoutes({ commit }, roles) {
+  generateRoutes ({ commit }, roles) {
     return new Promise(resolve => {
       let accessedRoutes
       if (roles.includes('admin')) {
