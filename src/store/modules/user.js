@@ -30,7 +30,7 @@ const mutations = {
 
 const actions = {
   // user login
-  login({ commit }, userInfo) {
+  login ({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       try {
@@ -51,7 +51,7 @@ const actions = {
   },
 
   // get user info
-  getInfo({ commit, state }) {
+  getInfo ({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
         const { data } = response
@@ -70,7 +70,7 @@ const actions = {
   },
 
   // user logout
-  logout({ commit, state, dispatch }) {
+  logout ({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
@@ -84,7 +84,7 @@ const actions = {
   },
 
   // remove token
-  resetToken({ commit }) {
+  resetToken ({ commit }) {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
@@ -94,8 +94,8 @@ const actions = {
   },
 
   // dynamically modify permissions
-  async changeRoles({ commit, dispatch }, role) {
-    const token = role + '-token'
+  async changeRoles ({ commit, dispatch }, role) {
+    const token = 'vue-' + role
 
     commit('SET_TOKEN', token)
     setToken(token)
@@ -107,10 +107,9 @@ const actions = {
     // generate accessible routes map based on roles
     const accessRoutes = await dispatch('permission/generateRoutes', roles, { root: true })
     // dynamically add accessible routes
-    router.addRoutes(accessRoutes)
-
-    // reset visited views and cached views
-    dispatch('tagsView/delAllViews', null, { root: true })
+    accessRoutes.forEach((item) => {
+      router.addRoute(item)
+    })
   }
 }
 

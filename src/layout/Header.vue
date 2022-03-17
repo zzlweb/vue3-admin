@@ -61,100 +61,100 @@
 </template>
 
 <script>
-import { defineComponent, onMounted } from "vue";
+import { defineComponent, onMounted, ref, onBeforeUnmount } from 'vue'
 import {
   DownOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   FullscreenOutlined,
-  FullscreenExitOutlined,
-} from "@ant-design/icons-vue";
-import { message } from "ant-design-vue";
-import { useRouter } from "vue-router";
-import { ref, onBeforeUnmount } from "vue";
-import screenfull from "screenfull";
-import store from "@/store/index";
+  FullscreenExitOutlined
+} from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { useRouter } from 'vue-router'
+
+import screenfull from 'screenfull'
+import store from '@/store/index'
 export default defineComponent({
   props: {
-    collapsed: Boolean,
+    collapsed: Boolean
   },
-  setup(props, { emit }) {
-    const ShowFullScreen = ref(false);
-    const router = useRouter();
+  setup (props, { emit }) {
+    const ShowFullScreen = ref(false)
+    const router = useRouter()
     const handleClick = async ({ key }) => {
       switch (key) {
-        case "2":
+        case '2':
           try {
-            await store.dispatch("user/logout");
-            message.success("退出登录成功！");
-            router.go(0);
+            await store.dispatch('user/logout')
+            message.success('退出登录成功！')
+            router.go(0)
           } catch (error) {
-            message.error("退出登录失败！");
+            message.error('退出登录失败！')
           }
-          break;
-        case "1":
-          router.push({ path: "/" });
-          break;
+          break
+        case '1':
+          router.push({ path: '/' })
+          break
         default:
-          break;
+          break
       }
-    };
+    }
 
     const ToggleCollapsed = () => {
-      emit("changeCollapsed");
-    };
+      emit('changeCollapsed')
+    }
 
     const ToggleShowFullScreen = () => {
       if (!screenfull.enabled) {
         message.info({
-          message: "you browser can not work",
-          type: "warning",
-        });
-        return false;
+          message: 'you browser can not work',
+          type: 'warning'
+        })
+        return false
       }
-      screenfull.toggle();
-    };
+      screenfull.toggle()
+    }
 
     const change = () => {
-      ShowFullScreen.value = screenfull.isFullscreen;
-    };
+      ShowFullScreen.value = screenfull.isFullscreen
+    }
 
     // 初始化screenfull
     const init = () => {
       if (screenfull.enabled) {
-        screenfull.on("change", change);
+        screenfull.on('change', change)
       }
-    };
+    }
 
     const destroy = () => {
       if (screenfull.enabled) {
-        screenfull.off("change", change);
+        screenfull.off('change', change)
       }
-    };
+    }
 
     onMounted(() => {
-      init();
-    });
+      init()
+    })
 
     onBeforeUnmount(() => {
-      destroy();
-    });
+      destroy()
+    })
 
     return {
       handleClick,
       ToggleCollapsed,
       ShowFullScreen,
-      ToggleShowFullScreen,
-    };
+      ToggleShowFullScreen
+    }
   },
   components: {
     DownOutlined,
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     FullscreenOutlined,
-    FullscreenExitOutlined,
-  },
-});
+    FullscreenExitOutlined
+  }
+})
 </script>
 
 <style lang="less" scoped>

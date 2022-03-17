@@ -27,7 +27,7 @@ export const constantRoutes = [{
     {
       path: '/Home',
       name: '首页',
-      component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue'),
+      component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue')
     },
     {
       path: '/redirect',
@@ -37,7 +37,7 @@ export const constantRoutes = [{
         path: '/redirect/:path(.*)',
         component: () => import(/* webpackChunkName: "redirect" */ '@/views/redirect/index')
       }]
-    },
+    }
   ]
 },
 ...modules,
@@ -56,7 +56,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/pdf/index',
     name: 'PDF',
-    meta:{
+    meta: {
       title: 'PDF',
       roles: ['admin']
     },
@@ -86,7 +86,7 @@ export const asyncRoutes = [
     name: '404',
     component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
     hidden: true
-  } 
+  }
 ]
 
 const router = createRouter({
@@ -96,7 +96,7 @@ const router = createRouter({
 
 // 重置路由
 // reset router
-export function resetRouter() {
+export function resetRouter () {
   router.getRoutes().forEach((route) => {
     const { name } = route
     router.hasRoute(name) && router.removeRoute(name)

@@ -3,45 +3,24 @@
     <div class="flex-col export-table">
       <div class="flex-row config-box">
         <div class="flex-row" style="align-items: center">
-          <FilenameOption v-model:value="fileName" />
-          <auto-width-option v-model:value="autoWidth" />
-          <book-type-option v-model:value="bookType" />
+          <div class="item">
+            <FilenameOption v-model:value="fileName" />
+          </div>
+          <div class="item">
+            <auto-width-option v-model:value="autoWidth" />
+          </div>
+          <div class="item">
+            <book-type-option v-model:value="bookType" />
+          </div>
         </div>
-        <div class="flex-row" style="align-items: center">
-          <a-button
-            class="editable-add-btn"
-            @click="handelExport"
-            type="ghost"
-            >导出表格</a-button
-          >
-          <a-button
-            class="editable-add-btn"
-            style=" margin-left: 8px"
-            @click="handleAdd"
-            type="primary"
-            >添加</a-button
-          >
+        <div class="flex-row item" style="align-items: center">
+          <a-button class="editable-add-btn" @click="handelExport" type="ghost">导出表格</a-button>
+          <a-button class="editable-add-btn" style=" margin-left: 8px" @click="handleAdd" type="primary">添加</a-button>
         </div>
       </div>
-      <a-table
-        class="fill"
-        bordered
-        :data-source="dataSource"
-        :loading="loading"
-        :columns="columns"
-        :pagination="pagination"
-        :row-key="(record) => record.id"
-        @change="handleChange"
-        :scroll="{ y: 700 }"
-      >
+      <a-table class="fill" bordered :data-source="dataSource" :loading="loading" :columns="columns" :pagination="pagination" :row-key="(record) => record.id" @change="handleChange" :scroll="{ y: 700 }">
         <template #operation="{ record }">
-          <a-popconfirm
-            v-if="dataSource.length"
-            title="确定要删除?"
-            okText="确定"
-            cancelText="取消"
-            @confirm="onDelete(record.id)"
-          >
+          <a-popconfirm v-if="dataSource.length" title="确定要删除?" okText="确定" cancelText="取消" @confirm="onDelete(record.id)">
             <a>删除</a>
           </a-popconfirm>
         </template>
@@ -53,7 +32,14 @@
   <add-list :visible="visible" @closeDraw="closeDraw"></add-list>
 </template>
 <script>
-import { computed, defineComponent, reactive, ref, onMounted, toRefs } from 'vue'
+import {
+  computed,
+  defineComponent,
+  reactive,
+  ref,
+  onMounted,
+  toRefs
+} from 'vue'
 import AutoWidthOption from './components/AutoWidthOption.vue'
 import BookTypeOption from './components/BookTypeOption.vue'
 import FilenameOption from './components/FilenameOption.vue'
@@ -248,6 +234,7 @@ export default defineComponent({
 <style lang="less">
 .export-table {
   height: 100%;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -305,6 +292,11 @@ export default defineComponent({
   width: 100%;
   justify-content: space-between;
   align-content: center;
-  height: 50px;
+  flex-wrap: wrap;
+  min-height: 60px;
+
+  .item {
+    margin-bottom: 10px;
+  }
 }
 </style>

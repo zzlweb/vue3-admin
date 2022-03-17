@@ -14,15 +14,16 @@ import {
   Divider,
   Badge,
   BackTop,
-  Carousel, 
-  Layout, 
-  Breadcrumb, 
+  Carousel,
+  Layout,
+  Breadcrumb,
   Tooltip,
   Table,
   Popconfirm,
   Drawer,
-  Radio, 
-  Spin
+  Radio,
+  Spin,
+  Space
 } from 'ant-design-vue'
 
 /**
@@ -31,7 +32,7 @@ import {
  * @param {ReturnType<typeof createApp>} app 整个应用的实例
  * @returns void
  */
-export default function loadComponent(app) {
+export default function loadComponent (app) {
   app.use(Button)
   app.use(Card)
   app.use(Row)
@@ -56,4 +57,5 @@ export default function loadComponent(app) {
   app.use(Drawer)
   app.use(Radio)
   app.use(Spin)
+  app.use(Space)
 }
