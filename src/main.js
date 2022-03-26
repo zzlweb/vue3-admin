@@ -5,7 +5,7 @@ import store from '@/store/index.js'
 import { AppConfig } from '@/config/app.js'
 import { loadAllPlugins } from '@/plugin/index.js'
 import { RegisterCommonComponent } from '@/components/index.js'
-
+import 'default-passive-events'
 // 引入样式文件
 
 import '@/styles/index.less'

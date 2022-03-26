@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, watch } from 'vue'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 import sideItem from './SideItem.vue'
 import store from '@/store'
 import { useRoute, useRouter } from 'vue-router'
@@ -25,7 +25,7 @@ export default defineComponent({
   setup () {
     const currentRoute = useRoute()
     const router = useRouter()
-    const list = store.getters.permissionRouter
+
     // 获取当前打开的子菜单
     const state = reactive({
       rootSubmenuKeys: ['测试'],
@@ -51,6 +51,10 @@ export default defineComponent({
         state.selectedKeys = [currentRoute.name]
       }
     )
+
+    const list = computed(() => {
+      return store.getters.permissionRouter
+    })
 
     // 互斥 submenu 展开收起的回调
     const onOpenChange = (openKeys) => {

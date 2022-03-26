@@ -96,11 +96,13 @@ const router = createRouter({
 
 // 重置路由
 // reset router
-export function resetRouter () {
-  router.getRoutes().forEach((route) => {
-    const { name } = route
-    router.hasRoute(name) && router.removeRoute(name)
+export const resetRouter = () => {
+  const newRouter = createRouter({
+    history: createWebHashHistory(),
+    routes: constantRoutes
   })
+
+  router.matcher = newRouter.matcher
 }
 
 export default router

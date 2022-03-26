@@ -1,18 +1,12 @@
 <template>
   <div>
-    <div style="margin-bottom: 15px;">
-      你的权限角色: {{ roles }}
-    </div>
+    <div style="margin-bottom: 15px">你的权限角色: {{ roles }}</div>
 
     <div style="margin-bottom: 20px">
       Switch Roles
       <a-radio-group v-model:value="switchRoles">
-        <a-radio-button value="admin">
-          admin
-        </a-radio-button>
-        <a-radio-button value="editor">
-          editor
-        </a-radio-button>
+        <a-radio-button value="admin"> admin </a-radio-button>
+        <a-radio-button value="editor"> editor </a-radio-button>
       </a-radio-group>
     </div>
   </div>
@@ -33,8 +27,9 @@ export default {
       },
 
       set (val) {
-        store.dispatch('user/changeRoles', val)
-        emit('change')
+        store.dispatch('user/changeRoles', val).then(() => {
+          emit('change')
+        })
       }
     })
     return { roles, switchRoles }
