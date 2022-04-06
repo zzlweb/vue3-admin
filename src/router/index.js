@@ -52,18 +52,18 @@ export const constantRoutes = [{
 // 异步路由
 export const asyncRoutes = [
   {
-    path: '/pdf',
+    path: '/Three',
     component: Layout,
-    redirect: '/pdf/index',
-    name: 'PDF',
+    redirect: '/Three/index',
+    name: 'Three',
     meta: {
-      title: 'PDF',
+      title: 'Three',
       roles: ['admin']
     },
     children: [{
       path: 'index',
-      name: 'PDF',
-      component: () => import(/* webpackChunkName: "PDF" */ '@/views/PDF/index')
+      name: 'Three',
+      component: () => import(/* webpackChunkName: "Three" */ '@/views/Three/index')
     }]
   },
   {

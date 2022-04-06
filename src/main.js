@@ -5,7 +5,6 @@ import store from '@/store/index.js'
 import { AppConfig } from '@/config/app.js'
 import { loadAllPlugins } from '@/plugin/index.js'
 import { RegisterCommonComponent } from '@/components/index.js'
-import 'default-passive-events'
 // 引入样式文件
 
 import '@/styles/index.less'
@@ -17,7 +16,6 @@ import '@/mock/index'
 import './permission'
 
 /** 将全局静态配置注入到应用中,可以通过 this.a读取,比 provide 和 inject 手动注入更方便  */
-/** 构造一个由function 的返回类型组成的 type */
 const app = createApp(App)
 app.config.globalProperties = AppConfig
 

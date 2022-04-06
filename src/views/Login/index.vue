@@ -48,74 +48,74 @@
 </template>
 
 <script >
-import { UserOutlined, LockOutlined } from "@ant-design/icons-vue";
-import { message } from "ant-design-vue";
-import { defineComponent, reactive, toRefs, ref } from "vue";
-import store from "../../store/index";
-import { useRoute, useRouter } from "vue-router";
+import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { defineComponent, reactive, toRefs, ref } from 'vue'
+import store from '../../store/index'
+import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
-  name: "login",
-  setup() {
+  name: 'login',
+  setup () {
     const formState = reactive({
       loading: false,
       formInline: {
-        username: "",
-        password: "",
-      },
-    });
-    const route = useRoute();
-    const router = useRouter();
+        username: '',
+        password: ''
+      }
+    })
+    const route = useRoute()
+    const router = useRouter()
     // 处理提交
     const handleFinish = async () => {
-      const { username, password } = formState.formInline;
-      if (username.trim() === "" || password.trim() === "") {
-        message.destroy();
-        return message.warning("用户名或者密码不能为空");
+      const { username, password } = formState.formInline
+      if (username.trim() === '' || password.trim() === '') {
+        message.destroy()
+        return message.warning('用户名或者密码不能为空')
       }
       // 启动加载
-      formState.loading = true;
+      formState.loading = true
       // 发送请求
-      const res = await store.dispatch("user/login", {
+      const res = await store.dispatch('user/login', {
         username,
-        password,
-      });
-      const { data } = res;
+        password
+      })
+      const { data } = res
       try {
         if (data.code === 200) {
-          let toPath = route.query?.redirect || "/";
-          if (["/permission/index", "/pdf/index"].indexOf(toPath) !== -1) {
-            toPath = "/";
+          let toPath = route.query?.redirect || '/'
+          if (['/permission/index', '/Three/index'].indexOf(toPath) !== -1) {
+            toPath = '/'
           }
-          message.success("登录成功!");
-          router.replace(toPath);
+          message.success('登录成功!')
+          router.replace(toPath)
         } else {
-          message.error(data.message || "登录失败!");
-          formState.loading = false;
-          message.destroy();
+          message.error(data.message || '登录失败!')
+          formState.loading = false
+          message.destroy()
         }
       } catch (error) {
-        store.dispatch("user/resetToken");
-        message.error("登录失败!");
-        formState.loading = false;
-        message.destroy();
+        store.dispatch('user/resetToken')
+        message.error('登录失败!')
+        formState.loading = false
+        message.destroy()
       }
-    };
+    }
     // 处理提交失败
     const handleFinishFailed = (errors) => {
-      console.log(errors);
-    };
+      console.log(errors)
+    }
     return {
       ...toRefs(formState),
       handleFinish,
-      handleFinishFailed,
-    };
+      handleFinishFailed
+    }
   },
   components: {
     UserOutlined,
-    LockOutlined,
-  },
-});
+    LockOutlined
+  }
+})
 </script>
 
 <style lang="less" scoped>
