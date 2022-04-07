@@ -23,21 +23,20 @@ export const constantRoutes = [{
   meta: {
     title: '首页'
   },
-  children: [
-    {
-      path: '/Home',
-      name: '首页',
-      component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue')
-    },
-    {
-      path: '/redirect',
-      component: Layout,
-      hidden: true,
-      children: [{
-        path: '/redirect/:path(.*)',
-        component: () => import(/* webpackChunkName: "redirect" */ '@/views/redirect/index')
-      }]
-    }
+  children: [{
+    path: '/Home',
+    name: '首页',
+    component: () => import(/* webpackChunkName: "Home" */ '@/views/Home/index.vue')
+  },
+  {
+    path: '/redirect',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: '/redirect/:path(.*)',
+      component: () => import(/* webpackChunkName: "redirect" */ '@/views/redirect/index')
+    }]
+  }
   ]
 },
 ...modules,
@@ -50,43 +49,36 @@ export const constantRoutes = [{
 ]
 
 // 异步路由
-export const asyncRoutes = [
-  {
-    path: '/Three',
-    component: Layout,
-    redirect: '/Three/index',
-    name: 'Three',
-    meta: {
-      title: 'Three',
-      roles: ['admin']
-    },
-    children: [{
-      path: 'index',
-      name: 'Three',
-      component: () => import(/* webpackChunkName: "Three" */ '@/views/Three/index')
-    }]
+export const asyncRoutes = [{
+  meta: {
+    title: 'Three',
+    roles: ['admin']
   },
-  {
-    path: '/permission',
-    component: Layout,
-    redirect: '/permission/index',
+  name: 'Three',
+  path: '/Three',
+  component: () => import(/* webpackChunkName: "Three" */ '@/views/Three/index')
+},
+{
+  path: '/permission',
+  component: Layout,
+  redirect: '/permission/index',
+  name: '权限页面',
+  meta: {
+    title: '权限页面',
+    roles: ['admin']
+  },
+  children: [{
+    path: 'index',
     name: '权限页面',
-    meta: {
-      title: '权限页面',
-      roles: ['admin']
-    },
-    children: [{
-      path: 'index',
-      name: '权限页面',
-      component: () => import(/* webpackChunkName: "permission" */'@/views/Permission/index')
-    }]
-  },
-  {
-    path: '/:pathMatch(.*)',
-    name: '404',
-    component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
-    hidden: true
-  }
+    component: () => import(/* webpackChunkName: "permission" */ '@/views/Permission/index')
+  }]
+},
+{
+  path: '/:pathMatch(.*)',
+  name: '404',
+  component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
+  hidden: true
+}
 ]
 
 const router = createRouter({

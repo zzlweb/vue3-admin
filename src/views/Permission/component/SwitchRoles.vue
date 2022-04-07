@@ -14,12 +14,15 @@
 
 <script>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import store from '@/store'
 export default {
   setup (props, { emit }) {
     const roles = computed(() => {
       return store.getters.roles
     })
+
+    const router = useRouter()
 
     const switchRoles = computed({
       get () {
@@ -29,6 +32,7 @@ export default {
       set (val) {
         store.dispatch('user/changeRoles', val).then(() => {
           emit('change')
+          router.go(0)
         })
       }
     })
