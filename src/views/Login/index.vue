@@ -45,6 +45,7 @@
       </a-form-item>
     </a-form>
   </div>
+  <wave />
 </template>
 
 <script >
@@ -127,6 +128,8 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   background-size: 100%;
+  z-index: 1;
+  position: relative;
 
   .login-logo {
     display: flex;
