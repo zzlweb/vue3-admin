@@ -136,6 +136,10 @@ export default defineComponent({
     align-items: top;
     margin-bottom: 30px;
 
+    h1 {
+      color: #fff;
+    }
+
     .svg-icon {
       font-size: 48px;
     }
