@@ -9,7 +9,7 @@
 
 <script>
 import * as THREE from 'three'
-import * as dat from 'dat.gui'
+// import * as dat from 'dat.gui'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
