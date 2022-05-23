@@ -10,7 +10,6 @@ const scene = new THREE.Scene()
 const textureLoader = new THREE.TextureLoader()
 const count = 400
 const dimension = 3
-
 const particleGeometry = new THREE.BufferGeometry()
 
 export default {
@@ -83,7 +82,10 @@ export default {
         color: new THREE.Color('#00a971'),
         alphaMap: particleTexture,
         transparent: true,
+        // 透明度没有完全奏效，有些圈子重叠罚款，但其他人表现得好像是坚实的。
+        // 我在了解了 depthWrite：false 和 depthTest：false 在 THREE.PointsMaterial 。
         depthWrite: false,
+        // 材质融合
         blending: THREE.AdditiveBlending,
         // 颜色混合
         vertexColors: true

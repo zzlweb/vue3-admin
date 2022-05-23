@@ -125,7 +125,7 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   background-size: 100%;
-  z-index: 1;
+  // z-index: 1;
   position: relative;
   height: 100%;
 
