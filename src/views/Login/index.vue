@@ -1,6 +1,7 @@
 <template>
-  <div class="login-box">
-    <div class="login-logo">
+  <div class="login-box flex-row">
+    <div>
+      <div class="login-logo">
       <h1>Vue3 Antd Admin</h1>
     </div>
     <a-form
@@ -44,8 +45,8 @@
         </a-button>
       </a-form-item>
     </a-form>
+    </div>
   </div>
-  <wave />
 </template>
 
 <script >
@@ -121,24 +122,17 @@ export default defineComponent({
 
 <style lang="less" scoped>
 .login-box {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  padding-top: 240px;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   background-size: 100%;
   z-index: 1;
   position: relative;
+  height: 100%;
 
   .login-logo {
-    display: flex;
-    align-items: top;
+    width: 100%;
+    text-align: center;
     margin-bottom: 30px;
-
-    h1 {
-      color: #fff;
-    }
 
     .svg-icon {
       font-size: 48px;

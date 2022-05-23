@@ -159,6 +159,7 @@ export default defineComponent({
 
 <style lang="less" scoped>
 .header {
+  position: relative;
   justify-content: space-between;
 }
 

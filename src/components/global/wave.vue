@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as THREE from 'three'
 const scene = new THREE.Scene()
 const textureLoader = new THREE.TextureLoader()
-const count = 20000
+const count = 400
 const dimension = 3
 
 const particleGeometry = new THREE.BufferGeometry()
@@ -22,7 +22,8 @@ export default {
       geometry: '', // 创建展示对象
       material: '', // 创建材质
       canvas: null, // DOM
-      controls: null
+      controls: null,
+      id: null
     })
 
     const sizes = reactive({
@@ -45,8 +46,9 @@ export default {
       geo.controls = new OrbitControls(geo.camera, geo.canvas)
       geo.controls.enableDamping = true
 
-      geo.camera.position.z = 5
-      geo.camera.position.x = 1
+      geo.camera.position.z = 8
+      geo.camera.position.x = 0
+      geo.camera.position.y = 1
 
       const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
       scene.add(ambientLight)
@@ -77,7 +79,7 @@ export default {
       )
 
       const particleMaterial = new THREE.PointsMaterial({
-        size: 0.2,
+        size: 0.5,
         color: new THREE.Color('#00a971'),
         alphaMap: particleTexture,
         transparent: true,
@@ -87,7 +89,7 @@ export default {
         vertexColors: true
       })
       const particles = new THREE.Points(particleGeometry, particleMaterial)
-      particles.rotation.y = -Math.PI * 0.2
+      // particles.rotation.y = -Math.PI * 0.2
       scene.add(particles)
     }
 
@@ -106,7 +108,7 @@ export default {
 
     // 动画
     const animate = () => {
-      const elapsedTime = clock.getElapsedTime()
+      const elapsedTime = clock.getElapsedTime() * 0.5
 
       for (let i = 0; i < count; i++) {
         const group = i * dimension
@@ -124,7 +126,7 @@ export default {
 
       geo.renderer.render(scene, geo.camera)
 
-      window.requestAnimationFrame(animate)
+      geo.id = window.requestAnimationFrame(animate)
     }
 
     // DOM 挂载
@@ -137,7 +139,8 @@ export default {
     // 卸载
     onUnmounted(() => {
       window.removeEventListener('resize', () => resize())
-      scene.dispose()
+      geo.renderer.dispose()
+      scene.clear()
     })
 
     // resize
@@ -165,6 +168,5 @@ export default {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 0;
 }
 </style>

@@ -1,5 +1,7 @@
 <template>
-  <div class="container">
+  <div class="container flex-row">
+    <wave />
+
     <upload-excel :before-upload="beforeUpload" :on-success="OnSuccess" />
 
     <div style="margin-top: 20px">
@@ -49,3 +51,13 @@ export default {
 }
 
 </script>
+
+<style lang="less" scoped>
+.container {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+}
+</style>

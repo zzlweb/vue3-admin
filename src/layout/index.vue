@@ -21,7 +21,7 @@
         <a-layout-content
           :style="{
             background: '#fff',
-            padding: '24px',
+            padding: '10px',
             margin: 0,
             minHeight: '280px',
           }"
