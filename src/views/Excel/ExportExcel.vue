@@ -29,7 +29,7 @@
   </a-spin>
 
   <!-- 右侧抽屉 添加数据 -->
-  <add-list :visible="visible" @closeDraw="closeDraw"></add-list>
+  <add-list :visible="visible" @closeDraw="closeDraw" />
 </template>
 <script>
 import {

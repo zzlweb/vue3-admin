@@ -4,15 +4,8 @@ import {
 } from 'vue-router'
 import Layout from '@/layout/index.vue'
 
-/**
- * 自动加载其他路由模块
- */
-const file = require.context('.', true, /\.js$/)
-const modules = []
-file.keys().forEach(key => {
-  if (key === './index.js') return
-  modules.push(file(key).default)
-})
+import ExcelModule from './Excel'
+import ThreeModule from './ThreeRouter'
 
 // 固定路由
 export const constantRoutes = [{
@@ -39,7 +32,7 @@ export const constantRoutes = [{
   }
   ]
 },
-...modules,
+ExcelModule,
 {
   path: '/login',
   name: 'login',
@@ -49,36 +42,29 @@ export const constantRoutes = [{
 ]
 
 // 异步路由
-export const asyncRoutes = [{
-  meta: {
-    title: 'Three',
-    roles: ['admin']
-  },
-  name: 'Three',
-  path: '/Three',
-  component: () => import(/* webpackChunkName: "Three" */ '@/views/Three/index')
-},
-{
-  path: '/permission',
-  component: Layout,
-  redirect: '/permission/index',
-  name: '权限页面',
-  meta: {
-    title: '权限页面',
-    roles: ['admin']
-  },
-  children: [{
-    path: 'index',
+export const asyncRoutes = [
+  ThreeModule,
+  {
+    path: '/permission',
+    component: Layout,
+    redirect: '/permission/index',
     name: '权限页面',
-    component: () => import(/* webpackChunkName: "permission" */ '@/views/Permission/index')
-  }]
-},
-{
-  path: '/:pathMatch(.*)',
-  name: '404',
-  component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
-  hidden: true
-}
+    meta: {
+      title: '权限页面',
+      roles: ['admin']
+    },
+    children: [{
+      path: 'index',
+      name: '权限页面',
+      component: () => import(/* webpackChunkName: "permission" */ '@/views/Permission/index')
+    }]
+  },
+  {
+    path: '/:pathMatch(.*)',
+    name: '404',
+    component: () => import(/* webpackChunkName: "redirect" */ '@/views/404/index.vue'),
+    hidden: true
+  }
 ]
 
 const router = createRouter({

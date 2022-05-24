@@ -140,7 +140,7 @@ export default {
 
     // 卸载
     onUnmounted(() => {
-      window.removeEventListener('resize', () => resize())
+      window.removeEventListener('resize', resize)
       geo.renderer.dispose()
       scene.clear()
     })

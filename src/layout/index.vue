@@ -24,6 +24,7 @@
             padding: '10px',
             margin: 0,
             minHeight: '280px',
+            position:'relative',
           }"
           class="content-area"
         >

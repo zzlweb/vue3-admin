@@ -1,8 +1,5 @@
 <template>
   <div class="three-container">
-    <div class="back-area flex-row" @click="handleRouter">
-      <LogoutOutlined />back to home
-    </div>
     <canvas class="webgl"></canvas>
   </div>
 </template>
@@ -11,21 +8,23 @@
 import * as THREE from 'three'
 // import * as dat from 'dat.gui'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-
-import { LogoutOutlined } from '@ant-design/icons-vue'
+import { onMounted, onUnmounted, reactive } from 'vue'
+// Scene
+const scene = new THREE.Scene()
 export default {
   setup () {
-    const router = useRouter()
+    const geo = reactive({
+      renderer: '',
+      resize: null
+    })
+
     // canvas
     onMounted(() => {
       // Debug
       // const gui = new dat.GUI()
       // canvas
       const canvas = document.querySelector('.webgl')
-      // Scene
-      const scene = new THREE.Scene()
+
       // Sizes
       const sizes = {
         width: canvas.offsetWidth,
@@ -273,14 +272,14 @@ export default {
       scene.add(axesHelper)
 
       // renderer
-      const renderer = new THREE.WebGLRenderer({
+      geo.renderer = new THREE.WebGLRenderer({
         canvas: canvas
       })
-      renderer.setSize(sizes.width, sizes.height)
+      geo.renderer.setSize(sizes.width, sizes.height)
       // dpi or 2
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-      renderer.setClearColor('#262837')
-      renderer.shadowMap.enabled = true
+      geo.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      geo.renderer.setClearColor('#262837')
+      geo.renderer.shadowMap.enabled = true
       floor.receiveShadow = true
       moonLight.castShadow = true
       doorLight.castShadow = true
@@ -314,9 +313,9 @@ export default {
       ghost3.shadow.mapSize.height = 256
       ghost3.shadow.camera.far = 7
 
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap
+      geo.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-      const resize = () => {
+      geo.resize = () => {
         sizes.width = canvas.offsetWidth
         sizes.height = canvas.offsetHeight
 
@@ -325,15 +324,13 @@ export default {
         camera.updateProjectionMatrix()
 
         // Update renderer
-        renderer.setSize(sizes.width, sizes.height)
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+        geo.renderer.setSize(sizes.width, sizes.height)
+        geo.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       }
-
-      resize()
 
       window.addEventListener('resize', () => {
         // Update sizes
-        resize()
+        geo.resize()
       })
 
       // Animate
@@ -357,7 +354,7 @@ export default {
         controls.update()
 
         // Render
-        renderer.render(scene, camera)
+        geo.renderer.render(scene, camera)
 
         // Call tick again on the next frame
         window.requestAnimationFrame(tick)
@@ -365,26 +362,25 @@ export default {
 
       tick()
     })
-    // methods
-    const handleRouter = () => {
-      router.push({ name: '首页' })
-    }
+
+    onUnmounted(() => {
+      geo.renderer.dispose()
+      scene.clear()
+      window.removeEventListener('resize', geo.resize)
+    })
 
     return {
-      handleRouter
     }
-  },
-  components: {
-    LogoutOutlined
   }
 }
 </script>
 
 <style lang="less" scoped>
 .three-container {
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
   position: absolute;
+  overflow: hidden;
 }
 
 .back-area {

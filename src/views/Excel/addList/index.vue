@@ -1,5 +1,5 @@
 <template>
-  <a-drawer title="添加一条新数据" :width="720" :visible="visible" :body-style="{ paddingBottom: '80px' }" @close="onClose" :get-container="false" :wrap-style="{ position: 'absolute' }">
+  <a-drawer title="添加一条新数据" :width="720" :visible="visible" :body-style="{ paddingBottom: '80px' }" @close="onClose"  :wrap-style="{ position: 'absolute' }">
     <a-form :model="form" :rules="rules" layout="vertical" ref="formRef">
       <a-row :gutter="16">
         <a-col :span="12">
