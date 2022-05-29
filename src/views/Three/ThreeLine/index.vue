@@ -36,83 +36,7 @@ export default {
     const createGeometry = () => {
       geo.geometry = new THREE.PlaneBufferGeometry(2, 2, 32, 32)
 
-      // 获取所有的顶点位置
-      const count = geo.geometry.attributes.position.count
-      // 产生count 个 随机数
-      const randoms = new Float32Array(count)
-
-      for (let i = 0; i < count; i++) {
-        randoms[i] = Math.random()
-      }
-
-      geo.geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1))
-
-      geo.material = new THREE.RawShaderMaterial({
-        vertexShader: `
-        // 投影矩阵
-        uniform mat4 projectionMatrix;
-        // 视角矩阵
-        uniform mat4 viewMatrix;
-        // 模型矩阵
-        uniform mat4 modelMatrix;
-
-        attribute vec3 position;
-
-        attribute float aRandom;
-
-        varying float vRandom; 
-
-        uniform vec2 uFrequency;
-
-        uniform float uTime;
-
-        varying float vTime; 
-
-        void main()
-        {
-            // gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-
-            vec4 modelPosition =  modelMatrix * vec4(position, 1.0);
-
-            modelPosition.y += sin(modelPosition.x * uFrequency.x - uTime) *0.1;
-
-            modelPosition.z += aRandom * 0.5 ;
-
-            vec4 viewPosition =  viewMatrix * modelPosition ;
-
-            vec4 projectedPosition = projectionMatrix * viewPosition;
-
-            gl_Position = projectedPosition;
-
-            vRandom = aRandom ; 
-
-            vTime = uTime; 
-        }
-      `,
-
-        fragmentShader: `
-        // 浮点精度
-        precision mediump float;
-
-        varying float vRandom; 
-        
-        varying float vTime; 
-
-        void main()
-        {   
-            gl_FragColor = vec4(gl_FragCoord.y/500.0*1.0, vRandom, vTime , 1);
-        }
-      `,
-        side: THREE.DoubleSide,
-        uniforms: {
-          uFrequency: { value: new THREE.Vector2(5, 0) },
-          uTime: {
-            value: 0
-          }
-        }
-      })
-
-      mesh = new THREE.Mesh(geo.geometry, geo.material)
+      // mesh = new THREE.Mesh(geo.geometry, geo.material)
 
       scene.add(mesh)
     }
@@ -145,7 +69,6 @@ export default {
     const animate = () => {
       const elapsedTime = clock.getElapsedTime()
 
-      geo.material.uniforms.uTime.value = elapsedTime
       // update controls
       geo.controls.update()
 

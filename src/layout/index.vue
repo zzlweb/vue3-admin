@@ -1,5 +1,5 @@
 <template>
-  <a-layout>
+  <a-layout class="flex-row">
     <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
       <div class="logo-area flex-row">Vue3 Admin</div>
       <side />

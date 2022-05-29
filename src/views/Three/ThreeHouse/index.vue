@@ -1,18 +1,24 @@
 <template>
-  <div class="three-container">
-    <canvas class="webgl"></canvas>
-  </div>
+  <a-spin :spinning="spinning" tip="Loading...">
+    <div class="three-container">
+      <canvas class="webgl"></canvas>
+    </div>
+  </a-spin>
+
 </template>
 
 <script>
 import * as THREE from 'three'
 // import * as dat from 'dat.gui'
+import { throttle } from 'lodash'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { onMounted, onUnmounted, reactive } from 'vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
 // Scene
 const scene = new THREE.Scene()
 export default {
   setup () {
+    const spinning = ref(true)
+
     const geo = reactive({
       renderer: '',
       resize: null
@@ -262,7 +268,7 @@ export default {
       const ghost1 = new THREE.PointLight('#ff00ff', 2, 3)
       const ghost2 = new THREE.PointLight('#00ffff', 2, 3)
       const ghost3 = new THREE.PointLight('#ffff00', 2, 3)
-      scene.add(ghost1, ghost3)
+      scene.add(ghost1)
 
       const fog = new THREE.Fog('#262837', 1, 15)
       scene.fog = fog
@@ -315,6 +321,8 @@ export default {
 
       geo.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
+      spinning.value = false
+
       geo.resize = () => {
         sizes.width = canvas.offsetWidth
         sizes.height = canvas.offsetHeight
@@ -328,10 +336,15 @@ export default {
         geo.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       }
 
-      window.addEventListener('resize', () => {
-        // Update sizes
-        geo.resize()
-      })
+      geo.resize()
+
+      window.addEventListener(
+        'resize',
+        throttle(() => {
+          // Update sizes
+          geo.resize()
+        }, 200)
+      )
 
       // Animate
       const clock = new THREE.Clock()
@@ -346,9 +359,11 @@ export default {
 
         const ghost3Angle = -elapsedTime * 0.18
         ghost3.position.x =
-        Math.cos(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.32))
-        ghost3.position.z = Math.sin(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.5))
-        ghost3.position.y = Math.sin(elapsedTime * 4) + Math.sin(elapsedTime * 2.5)
+          Math.cos(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.32))
+        ghost3.position.z =
+          Math.sin(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.5))
+        ghost3.position.y =
+          Math.sin(elapsedTime * 4) + Math.sin(elapsedTime * 2.5)
 
         // Update controls
         controls.update()
@@ -370,6 +385,7 @@ export default {
     })
 
     return {
+      spinning
     }
   }
 }
@@ -407,5 +423,14 @@ export default {
   outline: none;
   width: 100% !important;
   height: 100% !important;
+}
+
+.ant-spin-nested-loading {
+  height: 100%;
+  z-index: 10000;
+
+  :deep(.ant-spin-container) {
+    height: 100%;
+  }
 }
 </style>

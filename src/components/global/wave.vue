@@ -135,7 +135,7 @@ export default {
     onMounted(() => {
       window.addEventListener('resize', () => resize())
       init()
-      animate()
+      // animate()
     })
 
     // 卸载

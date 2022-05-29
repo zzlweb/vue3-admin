@@ -25,6 +25,13 @@ const ThreeRouter = {
         title: 'Three House'
       },
       component: () => import(/* webpackChunkName: "Three" */ '@/views/Three/ThreeHouse/index')
+    }, {
+      name: 'Three Line',
+      path: 'line',
+      meta: {
+        title: 'Three Line'
+      },
+      component: () => import(/* webpackChunkName: "Three" */ '@/views/Three/ThreeLine/index')
     }]
 }
 
