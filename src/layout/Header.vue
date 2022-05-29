@@ -15,6 +15,10 @@
       />
     </div>
     <div class="right-part flex-row">
+      <div class="language-part flex-row">
+        <language />
+      </div>
+
       <div class="full-screen">
         <a-tooltip placement="bottom">
           <fullscreen-outlined
@@ -48,10 +52,10 @@
         <template #overlay>
           <a-menu @click="handleClick">
             <a-menu-item key="1">
-              <div>首页</div>
+              <div>{{$t('HeaderList.home')}}</div>
             </a-menu-item>
             <a-menu-item key="2">
-              <div>退出登录</div>
+              <div>{{$t('HeaderList.loginOut')}}</div>
             </a-menu-item>
           </a-menu>
         </template>
@@ -192,5 +196,11 @@ export default defineComponent({
 
 .right-part .full-screen {
   margin-right: 25px;
+}
+
+.language-part {
+  margin-right: 25px;
+  justify-content: center;
+  align-items: center;
 }
 </style>

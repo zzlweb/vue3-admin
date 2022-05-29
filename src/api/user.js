@@ -12,7 +12,7 @@ export function login(params) {
   return http({
     url: Api.login,
     method: 'POST',
-    data: {...params}
+    data: { ...params }
   })
 }
 
@@ -20,6 +20,6 @@ export function getInfo(params) {
   return http({
     url: Api.getInfo,
     method: 'POST',
-    data: {params}
+    data: { params }
   })
 }

@@ -63,7 +63,7 @@ const getErrorCode2text = (response) => {
  */
 const http = Axios.create({
   baseURL: process.env.VUE_APP_BASE_URL,
-  timeout: 10000,
+  timeout: 100000
 })
 
 /**

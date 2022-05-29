@@ -109,7 +109,7 @@ export default defineComponent({
     // 当前展示分页
     const current = ref()
     // 展示的条数
-    const limit = ref(12)
+    const limit = ref(8)
     const editableData = reactive({})
     const loading = ref(false)
 

@@ -7,7 +7,10 @@ const state = {
   name: '',
   avatar: '',
   introduction: '',
-  roles: []
+  // 用户角色
+  roles: [],
+  // 语言
+  language: localStorage.getItem('lang') || 'zh'
 }
 
 const mutations = {
@@ -25,6 +28,9 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_language: (state, language) => {
+    state.language = language
   }
 }
 
