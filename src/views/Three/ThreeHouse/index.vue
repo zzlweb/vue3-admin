@@ -321,8 +321,6 @@ export default {
 
       geo.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-      spinning.value = false
-
       geo.resize = () => {
         sizes.width = canvas.offsetWidth
         sizes.height = canvas.offsetHeight
