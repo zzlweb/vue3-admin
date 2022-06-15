@@ -1,9 +1,7 @@
 <template>
-  <a-spin :spinning="spinning" tip="Loading...">
     <div class="three-container">
       <canvas class="webgl"></canvas>
     </div>
-  </a-spin>
 
 </template>
 
@@ -273,10 +271,6 @@ export default {
       const fog = new THREE.Fog('#262837', 1, 15)
       scene.fog = fog
 
-      // help
-      const axesHelper = new THREE.AxesHelper(5)
-      scene.add(axesHelper)
-
       // renderer
       geo.renderer = new THREE.WebGLRenderer({
         canvas: canvas
@@ -383,7 +377,6 @@ export default {
     })
 
     return {
-      spinning
     }
   }
 }

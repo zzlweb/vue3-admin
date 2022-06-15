@@ -32,6 +32,21 @@ export const constantRoutes = [{
   }
   ]
 },
+{
+  path: '/svgEditor',
+  component: Layout,
+  redirect: '/svgEditor/index',
+  name: '贝塞尔编辑器',
+  meta: {
+    title: '贝塞尔编辑器'
+  },
+  children: [{
+    path: 'index',
+    name: '贝塞尔编辑器',
+    component: () => import(/* webpackChunkName: "svgEditor" */ '@/views/svgEditor/index.vue')
+  }
+  ]
+},
 ExcelModule,
 {
   path: '/login',
