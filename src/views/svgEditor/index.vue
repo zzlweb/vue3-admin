@@ -1,12 +1,20 @@
 <template>
-  <div class="canvas-dom">
+  <div class="canvas-container">
+    <div class="canvas"></div>
+
+    <div class="control-panel">
+      <Controls></Controls>
+    </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, onMounted, reactive, onUnmounted } from 'vue'
-
+import { defineComponent, onMounted, reactive, onUnmounted, toRefs } from 'vue'
+import Controls from './controls.vue'
 export default defineComponent({
+  components: {
+    Controls
+  },
   setup () {
     // 状态定义
     const state = reactive({
@@ -23,8 +31,22 @@ export default defineComponent({
         { x: 200, y: 300, q: { x: 150, y: 50 } },
         { x: 300, y: 300, q: { x: 250, y: 550 } },
         { x: 400, y: 300, q: { x: 350, y: 50 } },
-        { x: 500, y: 300, c: [{ x: 450, y: 550 }, { x: 450, y: 50 }] },
-        { x: 600, y: 300, c: [{ x: 550, y: 50 }, { x: 550, y: 550 }] },
+        {
+          x: 500,
+          y: 300,
+          c: [
+            { x: 450, y: 550 },
+            { x: 450, y: 50 }
+          ]
+        },
+        {
+          x: 600,
+          y: 300,
+          c: [
+            { x: 550, y: 50 },
+            { x: 550, y: 550 }
+          ]
+        },
         { x: 700, y: 300, a: { rx: 50, ry: 50, rot: 0, laf: 1, sf: 1 } }
       ],
       activePoint: 2,
@@ -38,11 +60,6 @@ export default defineComponent({
     // 处理键盘抬起
     const handleKeyUp = () => {}
 
-    // 设置网格宽度
-    const setWidth = (e) => {
-      const v = positiveNumber(e.target.value)
-    }
-
     onMounted(() => {
       document.addEventListener('keydown', handleKeyDown, false)
       document.addEventListener('keyup', handleKeyUp, false)
@@ -52,16 +69,30 @@ export default defineComponent({
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
     })
+
+    return {
+      ...toRefs(state)
+    }
   }
 })
 </script>
 
 <style lang="less" scoped>
-.canvas-dom {
+.canvas-container {
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
   justify-content: center;
+
+  .control-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 1px solid rgb(214, 213, 213);
+    min-height: 100%;
+    border-radius: 4px;
+  }
 }
 </style>

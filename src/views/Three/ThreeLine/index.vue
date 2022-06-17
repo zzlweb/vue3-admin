@@ -14,7 +14,7 @@ export default {
     onMounted(() => {
       // 实例化
       const dom = document.querySelector('#container')
-      const TE = new ThreeEngine(dom)
+      // const TE = new ThreeEngine(dom)
     })
   }
 }

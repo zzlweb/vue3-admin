@@ -74,9 +74,9 @@ export default {
 
             vec4 modelPosition =  modelMatrix * vec4(position, 1.0);
 
-            modelPosition.y += sin(modelPosition.x * uFrequency.x - uTime) *0.1;
+            // modelPosition.y += sin(modelPosition.x * uFrequency.x - uTime) *0.1;
 
-            modelPosition.z += aRandom * 0.5 ;
+            // modelPosition.z += aRandom * 0.5 ;
 
             vec4 viewPosition =  viewMatrix * modelPosition ;
 
@@ -100,7 +100,7 @@ export default {
 
         void main()
         {   
-            gl_FragColor = vec4(gl_FragCoord.y/500.0*1.0, vRandom, vTime , 1);
+            gl_FragColor = vec4(gl_FragCoord.y/500.0*1.0, 1, 1 , 1);
         }
       `,
         side: THREE.DoubleSide,
