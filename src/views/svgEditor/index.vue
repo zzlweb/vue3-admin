@@ -1,9 +1,16 @@
 <template>
-  <div class="canvas-container">
-    <div class="canvas"></div>
+  <div class="canvas-container flex-row">
+    <div class="canvas">
+      <canvas-box :w="w" :h="h" :grid="grid"></canvas-box>
+    </div>
 
     <div class="control-panel">
-      <Controls></Controls>
+      <Controls
+        v-model:w="w"
+        v-model:h="h"
+        v-model:size="grid.size"
+        >
+      </Controls>
     </div>
   </div>
 </template>
@@ -11,9 +18,11 @@
 <script>
 import { defineComponent, onMounted, reactive, onUnmounted, toRefs } from 'vue'
 import Controls from './controls.vue'
+import CanvasBox from './canvas.vue'
 export default defineComponent({
   components: {
-    Controls
+    Controls,
+    CanvasBox
   },
   setup () {
     // 状态定义
@@ -80,11 +89,6 @@ export default defineComponent({
 <style lang="less" scoped>
 .canvas-container {
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  justify-content: center;
 
   .control-panel {
     position: absolute;

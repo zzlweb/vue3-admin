@@ -1,25 +1,53 @@
 <template>
   <div class="control-item flex-col">
-    <label class="control-item-label" v-if="name">{{name}}</label>
+    <label class="control-item-label" v-if="name">{{ name }}</label>
+    <!-- range -->
     <div v-if="type === 'rang'" class="add-range">
-      <a-row :gutter="16" align="middle">
+      <a-row :gutter="16" :align="middle">
         <a-col :span="14">
           <a-slider :value="value" @change="handleSlider" :min="0" :max="max" />
         </a-col>
         <a-col :span="10">
-          <a-input-number :value="value" @change="handleInput" :min="0" :max="max" style="margin-left: 16px" />
+          <a-input-number
+            :value="value"
+            @change="handleInput"
+            :min="1"
+            :max="max"
+          />
         </a-col>
       </a-row>
     </div>
 
-    <div v-if="type==='text'" class="add-text">
-      <a-input type="text" :value="value" @change="handleSlider"></a-input>
+    <!-- inputNumer -->
+    <div v-if="type === 'inputNumber'" class="add-text">
+      <a-input-number :min="1" :value="value" @change="handleInputBumber"></a-input-number>
+    </div>
+
+    <!-- button -->
+    <div v-if="type==='button'" class="add-button" @click="handleButton">
+      <a-button type="primary" @click="handleButton">{{value}}</a-button>
+    </div>
+
+    <!-- checkbox -->
+    <div v-if="type === 'checkbox'" class="add-checkbox">
+      <a-checkbox :checked="value" @change="handleCheck" >{{checkboxLabel}}</a-checkbox>
+    </div>
+
+    <!-- choice -->
+    <div v-if="type === 'radio'" class="add-radio">
+      <a-radio-group :value="value" @change="handleRadio">
+        <a-radio  :value="1">L</a-radio>
+        <a-radio  :value="2">Q</a-radio>
+        <a-radio  :value="3">C</a-radio>
+        <a-radio  :value="4">A</a-radio>
+      </a-radio-group>
     </div>
   </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue'
+// range
 const useRange = (emit) => {
   const handleSlider = (value) => {
     emit('update:value', value)
@@ -31,34 +59,88 @@ const useRange = (emit) => {
   }
   return { handleSlider, handleInput }
 }
+
+// inoutNumber 复用 range function
+const useInputNumber = (emit) => {
+  const handleInputBumber = (value) => {
+    if (typeof value === 'number') {
+      emit('update:value', value)
+    }
+  }
+  return { handleInputBumber }
+}
+
+// button
+const useButton = (emit) => {
+  const handleButton = () => {
+    emit('handleButton')
+  }
+
+  return { handleButton }
+}
+
+// checkbox
+const useCheckbox = (emit) => {
+  const handleCheck = () => {
+    emit('handleCheck')
+  }
+
+  return { handleCheck }
+}
+
+// choice
+const useRadio = (emit) => {
+  const handleRadio = (e) => {
+    emit('handleRadio', e)
+  }
+
+  return { handleRadio }
+}
+
 export default defineComponent({
   props: {
-    type: { type: String },
-    name: { type: String },
-    value: { type: Number },
-    max: { type: Number, default: 800 }
+    type: String,
+    name: String,
+    value: [String, Number, Boolean],
+    max: { type: Number },
+    checkboxLabel: [String]
   },
   setup (props, { emit }) {
-    // 处理调整范围逻辑
+    // range
     const { handleSlider, handleInput } = useRange(emit)
-
+    // button
+    const { handleButton } = useButton(emit)
+    // checkbox
+    const { handleCheck } = useCheckbox(emit)
+    // radio
+    const { handleRadio } = useRadio(emit)
+    // inputNumber
+    const { handleInputBumber } = useInputNumber(emit)
     return {
       handleSlider,
-      handleInput
+      handleInput,
+      handleButton,
+      handleCheck,
+      handleRadio,
+      handleInputBumber
     }
   }
 })
 </script>
 
 <style lang="less" scoped>
+.control-item {
+  margin-top: 10px;
+}
 .add-range,
-.add-text {
+.add-text,
+.add-button,
+.add-radio{
   padding: 0 8px;
 }
 
 .control-item-label {
   line-height: 32px;
-  margin-top: 10px;
   padding: 0 10px;
 }
 </style>

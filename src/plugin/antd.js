@@ -26,7 +26,8 @@ import {
   Space,
   TimePicker,
   Slider,
-  InputNumber
+  InputNumber,
+  Checkbox
 } from 'ant-design-vue'
 
 /**
@@ -35,7 +36,7 @@ import {
  * @param {ReturnType<typeof createApp>} app 整个应用的实例
  * @returns void
  */
-export default function loadComponent (app) {
+export default function loadComponent(app) {
   app.use(Button)
   app.use(Card)
   app.use(Row)
@@ -64,4 +65,5 @@ export default function loadComponent (app) {
   app.use(TimePicker)
   app.use(Slider)
   app.use(InputNumber)
+  app.use(Checkbox)
 }
