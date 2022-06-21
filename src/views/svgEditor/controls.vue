@@ -6,6 +6,7 @@
       <control
         :type="'inputNumber'"
         :value="w"
+        :step="10"
         @update:value="handleW"
         name="画布宽度"
       >
@@ -14,6 +15,7 @@
       <control
         :type="'inputNumber'"
         :value="h"
+        :step="10"
         @update:value="handleH"
         name="画布高度"
       >
@@ -24,8 +26,40 @@
       <control
         :type="'inputNumber'"
         :value="size"
+        :step="10"
         @update:value="handleSize"
         name="画布单位"
+      >
+      </control>
+       <!--  是否显示grid  -->
+      <control
+        :type="'checkbox'"
+        :value="show"
+        :checkboxLabel="'画布显示'"
+        @update:value="handleShow"
+        name="显示背景画布"
+      >
+      </control>
+    </div>
+
+    <div class="control-item flex-row">
+      <!--  选择曲线类型  -->
+      <control
+        :type="'radio'"
+        :value="'L'"
+        @update:value="handleType"
+        name="曲线类型"
+      >
+      </control>
+    </div>
+
+    <div class="control-item flex-row">
+      <!--  是否重置路径  -->
+      <control
+        :type="'button'"
+        :value="'Rwrite'"
+        @update:value="handleRPath"
+        name="是否重置路径"
       >
       </control>
     </div>
@@ -33,7 +67,7 @@
 </template>
 
 <script>
-import { defineComponent, reactive, ref, toRefs } from 'vue'
+import { defineComponent, reactive, toRefs } from 'vue'
 import control from './control.vue'
 import { positiveNumber } from './utils'
 export default defineComponent({
@@ -43,22 +77,23 @@ export default defineComponent({
   props: {
     w: Number,
     h: Number,
-    size: Number
+    size: Number,
+    show: Boolean
   },
   setup (props, { emit }) {
-    const type = ref('radio')
+    // const type = ref('radio')
 
     // range
     const state = reactive({
-      // range
-      range: { value: 0, name: '调整范围' },
-      // text
-      text: { value: '' },
-      // button
-      button: { value: '删除' },
-      // checkbox
-      checkbox: { value: true, checkboxLabel: '确定' },
-      radio: { value: 1 }
+      // // range
+      // range: { value: 0, name: '调整范围' },
+      // // text
+      // text: { value: '' },
+      // // button
+      // button: { value: '删除' },
+      // // checkbox
+      // checkbox: { value: true, checkboxLabel: '确定' },
+      // radio: { value: 1 }
     })
 
     // 处理调整画布width
@@ -72,7 +107,7 @@ export default defineComponent({
     // 处理调整画布Height
     const handleH = (value) => {
       value = positiveNumber(value)
-      value > 600 ? value = 600 : value
+      value > 800 ? value = 800 : value
       value < 1 ? value = 1 : value
       emit('update:h', value)
     }
@@ -81,12 +116,29 @@ export default defineComponent({
       emit('update:size', value)
     }
 
+    // 处理显示画布
+    const handleShow = (value) => {
+      emit('update:show', value)
+    }
+
+    // 处理重绘路径
+    const handleRPath = () => {
+      emit('handleRPath')
+    }
+
+    // 处理更换曲线类型
+    const handleType = () => {
+
+    }
+
     return {
-      type,
       ...toRefs(state),
       handleW,
       handleH,
-      handleSize
+      handleSize,
+      handleShow,
+      handleRPath,
+      handleType
     }
   }
 })
@@ -94,10 +146,10 @@ export default defineComponent({
 
 <style lang="less" scoped>
 .ad-Controls {
-  width: 215px;
+  width: 100%;
 
   .control-item {
-    justify-content: flex-start;
+    justify-content: space-between;
   }
 
   .ad-Controls-title {

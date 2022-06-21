@@ -20,7 +20,7 @@
 
     <!-- inputNumer -->
     <div v-if="type === 'inputNumber'" class="add-text">
-      <a-input-number :min="1" :value="value" @change="handleInputBumber"></a-input-number>
+      <a-input-number :min="1" :step="step" :value="value" @change="handleInputBumber"></a-input-number>
     </div>
 
     <!-- button -->
@@ -29,17 +29,16 @@
     </div>
 
     <!-- checkbox -->
-    <div v-if="type === 'checkbox'" class="add-checkbox">
+    <div v-if="type === 'checkbox'" class="add-checkbox" style="padding: 0 10px">
       <a-checkbox :checked="value" @change="handleCheck" >{{checkboxLabel}}</a-checkbox>
     </div>
 
     <!-- choice -->
     <div v-if="type === 'radio'" class="add-radio">
       <a-radio-group :value="value" @change="handleRadio">
-        <a-radio  :value="1">L</a-radio>
-        <a-radio  :value="2">Q</a-radio>
-        <a-radio  :value="3">C</a-radio>
-        <a-radio  :value="4">A</a-radio>
+        <a-radio  :value="'L'">L</a-radio>
+        <a-radio  :value="'Q'">Q</a-radio>
+        <a-radio  :value="'C'">C</a-radio>
       </a-radio-group>
     </div>
   </div>
@@ -73,7 +72,7 @@ const useInputNumber = (emit) => {
 // button
 const useButton = (emit) => {
   const handleButton = () => {
-    emit('handleButton')
+    emit('update:value')
   }
 
   return { handleButton }
@@ -81,8 +80,8 @@ const useButton = (emit) => {
 
 // checkbox
 const useCheckbox = (emit) => {
-  const handleCheck = () => {
-    emit('handleCheck')
+  const handleCheck = (e) => {
+    emit('update:value', e.target.checked)
   }
 
   return { handleCheck }
@@ -91,7 +90,7 @@ const useCheckbox = (emit) => {
 // choice
 const useRadio = (emit) => {
   const handleRadio = (e) => {
-    emit('handleRadio', e)
+    emit('update:value', e)
   }
 
   return { handleRadio }
@@ -103,7 +102,8 @@ export default defineComponent({
     name: String,
     value: [String, Number, Boolean],
     max: { type: Number },
-    checkboxLabel: [String]
+    checkboxLabel: [String],
+    step: Number
   },
   setup (props, { emit }) {
     // range

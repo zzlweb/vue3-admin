@@ -204,8 +204,5 @@ export default {
 #wave-container {
   width: 100% !important;
   height: 100% !important;
-  position: absolute;
-  left: 0;
-  top: 0;
 }
 </style>

@@ -1,22 +1,18 @@
 <template>
   <div class="canvas-container flex-row">
-    <div class="canvas">
-      <canvas-box :w="w" :h="h" :grid="grid"></canvas-box>
+    <div class="canvas flex-row fill-flex">
+      <canvas-box :w="w" :h="h" :grid="grid" :path="generatepath" :ctrl="ctrl" :points="points" @addPoint="addPoint"></canvas-box>
     </div>
 
-    <div class="control-panel">
-      <Controls
-        v-model:w="w"
-        v-model:h="h"
-        v-model:size="grid.size"
-        >
-      </Controls>
+    <div class="control-panel flex-row">
+      <controls v-model:w="w" v-model:h="h" v-model:size="grid.size" v-model:show="grid.show" @handleRPath="handleRPath">
+      </controls>
     </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, onMounted, reactive, onUnmounted, toRefs } from 'vue'
+import { defineComponent, onMounted, reactive, onUnmounted, toRefs, watch, ref, computed } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
 export default defineComponent({
@@ -28,7 +24,7 @@ export default defineComponent({
     // 状态定义
     const state = reactive({
       w: 800,
-      h: 600,
+      h: 800,
       grid: {
         show: true,
         snap: true,
@@ -36,27 +32,24 @@ export default defineComponent({
       },
       ctrl: false,
       points: [
-        { x: 100, y: 300 },
-        { x: 200, y: 300, q: { x: 150, y: 50 } },
-        { x: 300, y: 300, q: { x: 250, y: 550 } },
-        { x: 400, y: 300, q: { x: 350, y: 50 } },
-        {
-          x: 500,
-          y: 300,
-          c: [
-            { x: 450, y: 550 },
-            { x: 450, y: 50 }
-          ]
-        },
-        {
-          x: 600,
-          y: 300,
-          c: [
-            { x: 550, y: 50 },
-            { x: 550, y: 550 }
-          ]
-        },
-        { x: 700, y: 300, a: { rx: 50, ry: 50, rot: 0, laf: 1, sf: 1 } }
+        // { x: 200, y: 300, q: { x: 150, y: 50 } },
+        // {
+        //   x: 500,
+        //   y: 300,
+        //   c: [
+        //     { x: 450, y: 550 },
+        //     { x: 450, y: 50 }
+        //   ]
+        // },
+        // {
+        //   x: 600,
+        //   y: 300,
+        //   c: [
+        //     { x: 550, y: 50 },
+        //     { x: 550, y: 550 }
+        //   ]
+        // },
+        // { x: 700, y: 300, a: { rx: 50, ry: 50, rot: 0, laf: 1, sf: 1 } }
       ],
       activePoint: 2,
       draggedPoint: false,
@@ -64,10 +57,66 @@ export default defineComponent({
       draggedCubic: false,
       closePath: false
     })
+
     // 处理键盘按下
-    const handleKeyDown = () => {}
+    const handleKeyDown = (e) => {
+      // 判断是否点击ctrl
+      if (e.ctrlKey) state.ctrl = true
+    }
     // 处理键盘抬起
-    const handleKeyUp = () => {}
+    const handleKeyUp = (e) => {
+      state.ctrl = false
+    }
+
+    // 处理添加点
+    const addPoint = (value) => {
+      // 获取新添加的点
+      state.points.push(value)
+      // 更新当前激活点
+      state.activePoint = state.points.length - 1
+    }
+
+    // 暂定监听重置点
+    watch(() => state.grid.size, (newValue, oldValue) => {
+      handleRPath()
+    })
+
+    // 计算 path
+    const generatepath = computed(() => {
+      const { points, closePath } = state
+      let d = ''
+
+      points.forEach((p, i) => {
+        if (i === 0) {
+          // first point
+          d += 'M '
+        } else if (p.q) {
+          // quadratic
+          d += `Q ${p.q.x} ${p.q.y} `
+        } else if (p.c) {
+          // cubic
+          d += `C ${p.c[0].x} ${p.c[0].y} ${p.c[1].x} ${p.c[1].y} `
+        } else if (p.a) {
+          // arc
+          d += `A ${p.a.rx} ${p.a.ry} ${p.a.rot} ${p.a.laf} ${p.a.sf} `
+        } else {
+          d += 'L '
+        }
+
+        d += `${p.x} ${p.y} `
+      })
+
+      if (closePath) d += 'Z'
+
+      console.log(d)
+
+      return d
+    })
+
+    // 处理重新绘制path
+    const handleRPath = () => {
+      state.points = []
+    }
 
     onMounted(() => {
       document.addEventListener('keydown', handleKeyDown, false)
@@ -80,7 +129,10 @@ export default defineComponent({
     })
 
     return {
-      ...toRefs(state)
+      ...toRefs(state),
+      addPoint,
+      generatepath,
+      handleRPath
     }
   }
 })
@@ -90,13 +142,19 @@ export default defineComponent({
 .canvas-container {
   height: 100%;
 
+  .canvas {
+    justify-content: center;
+    align-items: center;
+  }
+
   .control-panel {
-    position: absolute;
-    top: 0;
-    right: 0;
+    width: 250px;
+    min-width: 250px;
     border: 1px solid rgb(214, 213, 213);
     min-height: 100%;
     border-radius: 4px;
+    justify-content: center;
+    overflow: hidden;
   }
 }
 </style>
