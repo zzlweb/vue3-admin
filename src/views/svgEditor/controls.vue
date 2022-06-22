@@ -1,7 +1,7 @@
 <template>
   <div class="ad-Controls">
     <div class="ad-Controls-title">控制面板</div>
-    <div class="control-item flex-row">
+    <div class="control-box flex-row">
       <!--  画图区域设置  -->
       <control
         :type="'inputNumber'"
@@ -21,7 +21,7 @@
       >
       </control>
     </div>
-    <div class="control-item flex-row">
+    <div class="control-box flex-row">
       <!--  画布网格单位设置  -->
       <control
         :type="'inputNumber'"
@@ -42,24 +42,32 @@
       </control>
     </div>
 
-    <div class="control-item flex-row">
+    <div class="control-box flex-row">
       <!--  选择曲线类型  -->
       <control
         :type="'radio'"
-        :value="'L'"
+        :value="lineType"
         @update:value="handleType"
         name="曲线类型"
       >
       </control>
-    </div>
-
-    <div class="control-item flex-row">
-      <!--  是否重置路径  -->
+      <!--  返回上一步 -->
       <control
         :type="'button'"
         :value="'Rwrite'"
         @update:value="handleRPath"
-        name="是否重置路径"
+        name="返回上一步"
+      >
+      </control>
+    </div>
+
+    <div class="control-box flex-row">
+      <!--  重置路径  -->
+      <control
+        :type="'button'"
+        :value="'Rwrite'"
+        @update:value="handleRPath"
+        name="重置路径"
       >
       </control>
     </div>
@@ -78,7 +86,8 @@ export default defineComponent({
     w: Number,
     h: Number,
     size: Number,
-    show: Boolean
+    show: Boolean,
+    lineType: String
   },
   setup (props, { emit }) {
     // const type = ref('radio')
@@ -127,8 +136,8 @@ export default defineComponent({
     }
 
     // 处理更换曲线类型
-    const handleType = () => {
-
+    const handleType = (e) => {
+      emit('handleType', e)
     }
 
     return {
@@ -148,8 +157,13 @@ export default defineComponent({
 .ad-Controls {
   width: 100%;
 
-  .control-item {
+  .control-box {
     justify-content: space-between;
+
+    .control-item {
+      width: 50%;
+      justify-items: flex-start;
+    }
   }
 
   .ad-Controls-title {

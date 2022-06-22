@@ -1,6 +1,6 @@
 <template>
   <div class="svg-dom" ref="svgDom">
-    <svg :width="w" :height="h" @click="addPoints">
+    <svg :width="w" :height="h" @click="addPoints" @mousemove="handleMouseMove">
       <g :class="{'hidden': !show}" class="add-g">
         <line v-for="(item, index) in Math.round(w/size)" :key="index" :x1="item*size" :y1="0" :x2="item*size" :y2="h">
         </line>
@@ -12,10 +12,10 @@
       </path>
       <!-- points -->
       <g>
-        <g v-for="(item, index) in points" :key="index">
+        <g v-for="(item, index) in points" :key="index" :class="{'point-active': activePoint -1  === index }">
           <circle :cx="item.x" :cy="item.y" r="8" class="point"></circle>
-          <cubic v-if="item.c" />
-          <quadratic v-if="item.q"></quadratic>
+          <cubic v-if="item.c" :x1="item.c[0].x" :y1="item.c[0].y" :x2="item.c[1].x" :y2="item.c[1].y" :p1x="points[index-1].x" :p1y="points[index-1].y" :p2x="points[index].x" :p2y="points[index].y"/>
+          <quadratic v-if="item.q" :p1x="points[index - 1].x" :p1y="points[index-1].y" :p2x="item.x" :p2y="item.y" :x="item.q.x" :y="item.q.y"></quadratic>
         </g>
       </g>
     </svg>
@@ -41,7 +41,15 @@ export default {
     //  默认添加的一些点
     points: Object,
     // 计算所得path
-    path: String
+    path: String,
+    // 当前激活点下标
+    activePoint: Number,
+    // 是否拖拽点
+    draggedPoint: Boolean,
+    // 是否拖拽二次贝塞尔曲线控制柄
+    draggedQuadratic: Boolean,
+    // 是否拖拽三次贝塞尔曲线控制柄
+    draggedCubic: Boolean
   },
   components: {
     cubic,
@@ -62,7 +70,7 @@ export default {
     // grid 信息
     const { show, snap, size } = toRefs(props.grid)
     // ctrl
-    const { ctrl } = toRefs(props)
+    const { ctrl, draggedPoint, draggedQuadratic, draggedCubic } = toRefs(props)
     // 处理添加点逻辑
     const addPoints = (e) => {
       if (ctrl.value) {
@@ -87,12 +95,29 @@ export default {
     // resize 处理页面resize 相关数据
     const resize = () => {}
 
+    // 处理mousemove
+    const handleMouseMove = (e) => {
+      // 排除添加点时的鼠标移动
+      if (!ctrl.value) {
+        // 如果是拖拽点
+        if (draggedPoint.value) {
+          setPointCoords(getAddMouse(e))
+        }
+      }
+    }
+
+    // 改变原坐标点为拖拽后的坐标点
+    const setPointCoords = (value) => {
+      emit('setPointValue', value)
+    }
+
     return {
       show,
       snap,
       size,
       addPoints,
-      svgDom
+      svgDom,
+      handleMouseMove
     }
   }
 }
@@ -101,6 +126,7 @@ export default {
 <style lang="less" scoped>
 svg {
   display: block;
+  overflow: visible;
   background-color: #fff;
   border: 1px solid #eee;
 }

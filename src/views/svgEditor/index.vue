@@ -1,18 +1,35 @@
 <template>
   <div class="canvas-container flex-row">
     <div class="canvas flex-row fill-flex">
-      <canvas-box :w="w" :h="h" :grid="grid" :path="generatepath" :ctrl="ctrl" :points="points" @addPoint="addPoint"></canvas-box>
+      <canvas-box :w="w" :h="h" :grid="grid"
+      :path="generatepath" :ctrl="ctrl"
+      :points="points" @addPoint="addPoint"
+      :activePoint="activePoint"
+      :draggedPoint="draggedPoint"
+      :draggedQuadratic="draggedQuadratic"
+      :draggedCubic="draggedCubic"
+      @setPointValue="setPointValue"
+      ></canvas-box>
     </div>
 
     <div class="control-panel flex-row">
-      <controls v-model:w="w" v-model:h="h" v-model:size="grid.size" v-model:show="grid.show" @handleRPath="handleRPath">
+      <controls v-model:w="w" v-model:h="h" v-model:size="grid.size" v-model:show="grid.show" @handleRPath="handleRPath" @handleType="handleLineType" :lineType="lineType">
       </controls>
     </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, onMounted, reactive, onUnmounted, toRefs, watch, ref, computed } from 'vue'
+import {
+  defineComponent,
+  onMounted,
+  reactive,
+  onUnmounted,
+  toRefs,
+  watch,
+  ref,
+  computed
+} from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
 export default defineComponent({
@@ -32,7 +49,7 @@ export default defineComponent({
       },
       ctrl: false,
       points: [
-        // { x: 200, y: 300, q: { x: 150, y: 50 } },
+        // { x: 200, y: 300, q: { x: 150, y: 50 } }
         // {
         //   x: 500,
         //   y: 300,
@@ -51,11 +68,12 @@ export default defineComponent({
         // },
         // { x: 700, y: 300, a: { rx: 50, ry: 50, rot: 0, laf: 1, sf: 1 } }
       ],
-      activePoint: 2,
-      draggedPoint: false,
+      activePoint: 0,
+      draggedPoint: true,
       draggedQuadratic: false,
       draggedCubic: false,
-      closePath: false
+      closePath: false,
+      lineType: 'Q'
     })
 
     // 处理键盘按下
@@ -72,16 +90,20 @@ export default defineComponent({
     const addPoint = (value) => {
       // 获取新添加的点
       state.points.push(value)
+      createPoint()
       // 更新当前激活点
-      state.activePoint = state.points.length - 1
+      state.activePoint = state.points.length
     }
 
     // 暂定监听重置点
-    watch(() => state.grid.size, (newValue, oldValue) => {
-      handleRPath()
-    })
+    watch(
+      () => state.grid.size,
+      (newValue, oldValue) => {
+        handleRPath()
+      }
+    )
 
-    // 计算 path
+    // 计算生成path
     const generatepath = computed(() => {
       const { points, closePath } = state
       let d = ''
@@ -96,26 +118,70 @@ export default defineComponent({
         } else if (p.c) {
           // cubic
           d += `C ${p.c[0].x} ${p.c[0].y} ${p.c[1].x} ${p.c[1].y} `
-        } else if (p.a) {
-          // arc
-          d += `A ${p.a.rx} ${p.a.ry} ${p.a.rot} ${p.a.laf} ${p.a.sf} `
-        } else {
-          d += 'L '
         }
-
         d += `${p.x} ${p.y} `
       })
 
       if (closePath) d += 'Z'
-
-      console.log(d)
-
       return d
     })
 
     // 处理重新绘制path
     const handleRPath = () => {
       state.points = []
+      state.activePoint = 0
+    }
+
+    // 切换曲线生成类型,并根据类型生成point
+    const handleLineType = (e) => {
+      state.lineType = e.target.value
+    }
+
+    // 根据不同曲线类型,变化添加的点坐标
+    const createPoint = () => {
+      const points = state.points
+      const active = state.activePoint
+
+      // not the first point
+      if (active !== 0) {
+        const v = state.lineType
+
+        switch (v) {
+          case 'Q':
+            points[active] = {
+              x: points[active].x,
+              y: points[active].y,
+              q: {
+                x: (points[active].x + points[active - 1].x) / 2 - 50,
+                y: (points[active].y + points[active - 1].y) / 2
+              }
+            }
+            break
+          case 'C':
+            points[active] = {
+              x: points[active].x,
+              y: points[active].y,
+              c: [
+                {
+                  x: (points[active].x + points[active - 1].x - 50) / 2,
+                  y: (points[active].y + points[active - 1].y) / 2
+                },
+                {
+                  x: (points[active].x + points[active - 1].x + 50) / 2,
+                  y: (points[active].y + points[active - 1].y) / 2
+                }
+              ]
+            }
+            break
+        }
+
+        state.points = points
+      }
+    }
+
+    // 拖拽后坐标改变,  同步值到 state
+    const setPointValue = (value) => {
+      console.log(value)
     }
 
     onMounted(() => {
@@ -132,7 +198,9 @@ export default defineComponent({
       ...toRefs(state),
       addPoint,
       generatepath,
-      handleRPath
+      handleRPath,
+      handleLineType,
+      setPointValue
     }
   }
 })

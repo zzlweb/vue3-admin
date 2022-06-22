@@ -8,12 +8,7 @@
           <a-slider :value="value" @change="handleSlider" :min="0" :max="max" />
         </a-col>
         <a-col :span="10">
-          <a-input-number
-            :value="value"
-            @change="handleInput"
-            :min="1"
-            :max="max"
-          />
+          <a-input-number :value="value" @change="handleInput" :min="1" :max="max" />
         </a-col>
       </a-row>
     </div>
@@ -30,15 +25,14 @@
 
     <!-- checkbox -->
     <div v-if="type === 'checkbox'" class="add-checkbox" style="padding: 0 10px">
-      <a-checkbox :checked="value" @change="handleCheck" >{{checkboxLabel}}</a-checkbox>
+      <a-checkbox :checked="value" @change="handleCheck">{{checkboxLabel}}</a-checkbox>
     </div>
 
     <!-- choice -->
     <div v-if="type === 'radio'" class="add-radio">
       <a-radio-group :value="value" @change="handleRadio">
-        <a-radio  :value="'L'">L</a-radio>
-        <a-radio  :value="'Q'">Q</a-radio>
-        <a-radio  :value="'C'">C</a-radio>
+        <a-radio :value="'Q'">Q</a-radio>
+        <a-radio :value="'C'">C</a-radio>
       </a-radio-group>
     </div>
   </div>
@@ -135,7 +129,7 @@ export default defineComponent({
 .add-range,
 .add-text,
 .add-button,
-.add-radio{
+.add-radio {
   padding: 0 8px;
 }
 

@@ -1,9 +1,9 @@
 <template>
-  <g className="ad-Anchor">
-    <line className="ad-Anchor-line" :x1=p1x :y1=p1y :x2=x1 :y2=y1 />
-    <line className="ad-Anchor-line" :x1=p2x :y1=p2y :x2=x2 :y2=y2 />
-    <circle className="ad-Anchor-point" :cx=x1 :cy=y1 r=6 />
-    <circle className="ad-Anchor-point" :cx=x2 :cy=y2 r=6 />
+  <g class="ad-Anchor">
+    <line class="ad-Anchor-line" :x1="p1x" :y1="p1y" :x2="x1" :y2="y1" />
+    <line class="ad-Anchor-line" :x1="p2x" :y1="p2y" :x2="x2" :y2="y2" />
+    <circle class="ad-Anchor-point" :cx="x1" :cy="y1" r=6 />
+    <circle class="ad-Anchor-point" :cx="x2" :cy="y2" r=6 />
   </g>
 </template>
 
@@ -11,6 +11,16 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
+  props: {
+    x1: Number,
+    y1: Number,
+    x2: Number,
+    y2: Number,
+    p1x: Number,
+    p1y: Number,
+    p2x: Number,
+    p2y: Number
+  },
   setup () {}
 })
 </script>
