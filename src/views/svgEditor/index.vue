@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-container flex-row">
+  <div class="canvas-container flex-row" @mouseup="cancleDragger">
     <div class="canvas flex-row fill-flex">
       <canvas-box :w="w" :h="h" :grid="grid"
       :path="generatepath" :ctrl="ctrl"
@@ -9,11 +9,24 @@
       :draggedQuadratic="draggedQuadratic"
       :draggedCubic="draggedCubic"
       @setPointValue="setPointValue"
+      @setQuadraticPointValue="setQuadraticPointValue"
+      @setCubicCoords="setCubicCoords"
+      @handlePointDragger="handlePointDragger"
+      @handleDraggerQua="handleDraggerQua"
+      @handleSetCubic="handleSetCubic"
       ></canvas-box>
     </div>
 
     <div class="control-panel flex-row">
-      <controls v-model:w="w" v-model:h="h" v-model:size="grid.size" v-model:show="grid.show" @handleRPath="handleRPath" @handleType="handleLineType" :lineType="lineType">
+      <controls
+      v-model:w="w"
+      v-model:h="h"
+      :path="generatepath"
+      v-model:size="grid.size"
+      v-model:show="grid.show"
+      @handleRPath="handleRPath"
+      @handleType="handleLineType"
+      :lineType="lineType">
       </controls>
     </div>
   </div>
@@ -48,28 +61,9 @@ export default defineComponent({
         size: 50
       },
       ctrl: false,
-      points: [
-        // { x: 200, y: 300, q: { x: 150, y: 50 } }
-        // {
-        //   x: 500,
-        //   y: 300,
-        //   c: [
-        //     { x: 450, y: 550 },
-        //     { x: 450, y: 50 }
-        //   ]
-        // },
-        // {
-        //   x: 600,
-        //   y: 300,
-        //   c: [
-        //     { x: 550, y: 50 },
-        //     { x: 550, y: 550 }
-        //   ]
-        // },
-        // { x: 700, y: 300, a: { rx: 50, ry: 50, rot: 0, laf: 1, sf: 1 } }
-      ],
+      points: [],
       activePoint: 0,
-      draggedPoint: true,
+      draggedPoint: false,
       draggedQuadratic: false,
       draggedCubic: false,
       closePath: false,
@@ -90,9 +84,9 @@ export default defineComponent({
     const addPoint = (value) => {
       // 获取新添加的点
       state.points.push(value)
-      createPoint()
-      // 更新当前激活点
+      // 更新当前激活点下标 + 1
       state.activePoint = state.points.length
+      createPoint()
     }
 
     // 暂定监听重置点
@@ -123,6 +117,7 @@ export default defineComponent({
       })
 
       if (closePath) d += 'Z'
+
       return d
     })
 
@@ -140,9 +135,8 @@ export default defineComponent({
     // 根据不同曲线类型,变化添加的点坐标
     const createPoint = () => {
       const points = state.points
-      const active = state.activePoint
+      const active = state.activePoint - 1
 
-      // not the first point
       if (active !== 0) {
         const v = state.lineType
 
@@ -152,7 +146,7 @@ export default defineComponent({
               x: points[active].x,
               y: points[active].y,
               q: {
-                x: (points[active].x + points[active - 1].x) / 2 - 50,
+                x: (points[active].x + points[active - 1].x - 50) / 2,
                 y: (points[active].y + points[active - 1].y) / 2
               }
             }
@@ -181,7 +175,52 @@ export default defineComponent({
 
     // 拖拽后坐标改变,  同步值到 state
     const setPointValue = (value) => {
-      console.log(value)
+      state.points[state.activePoint - 1].x = value.x
+      state.points[state.activePoint - 1].y = value.y
+    }
+
+    const setQuadraticPointValue = (value) => {
+      state.points[state.activePoint - 1].q.x = value.x
+      state.points[state.activePoint - 1].q.y = value.y
+    }
+
+    const setCubicCoords = (value) => {
+      state.points[state.activePoint - 1].c[state.draggedCubic].x = value.x
+      state.points[state.activePoint - 1].c[state.draggedCubic].y = value.y
+    }
+
+    // 处理拖拽点逻辑
+    const handlePointDragger = (index) => {
+      // 排除 ctrl 状态
+      if (!state.ctrl) {
+        state.activePoint = index + 1
+        state.draggedPoint = true
+      }
+    }
+
+    // 处理二次贝塞尔曲线控制点拖拽
+    const handleDraggerQua = (index) => {
+      if (!state.ctrl) {
+        state.draggedQuadratic = true
+        state.activePoint = index + 1
+      }
+    }
+
+    // 处理三次贝塞尔曲线控制点拖拽
+    const handleSetCubic = (value) => {
+      if (!state.ctrl) {
+        // 当前激活点下标
+        state.activePoint = value.cubicIndexValue + 1
+        // 手柄下标
+        state.draggedCubic = value.index
+      }
+    }
+
+    // 取消拖拽状态
+    const cancleDragger = () => {
+      state.draggedPoint = false
+      state.draggedQuadratic = false
+      state.draggedCubic = false
     }
 
     onMounted(() => {
@@ -200,7 +239,13 @@ export default defineComponent({
       generatepath,
       handleRPath,
       handleLineType,
-      setPointValue
+      setPointValue,
+      handlePointDragger,
+      cancleDragger,
+      handleDraggerQua,
+      handleSetCubic,
+      setQuadraticPointValue,
+      setCubicCoords
     }
   }
 })

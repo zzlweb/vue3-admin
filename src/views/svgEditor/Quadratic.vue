@@ -2,12 +2,12 @@
   <g class="ad-Anchor">
     <line class="ad-Anchor-line" :x1="p1x" :y1="p1y" :x2="x" :y2="y" />
     <line class="ad-Anchor-line" :x1="x" :y1="y" :x2="p2x" :y2="p2y" />
-    <circle class="ad-Anchor-point" :cx="x" :cy="y" r=6 />
+    <circle class="ad-Anchor-point" :cx="x" :cy="y" r=6 @mousedown="handleDraggerQuadratic"/>
   </g>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { toRefs, defineComponent } from 'vue'
 
 export default defineComponent({
   props: {
@@ -16,9 +16,20 @@ export default defineComponent({
     p1x: Number,
     p1y: Number,
     p2x: Number,
-    p2y: Number
+    p2y: Number,
+    quadraticIndex: Number
   },
-  setup () {}
+  setup (props, { emit }) {
+    const { quadraticIndex } = toRefs(props)
+
+    const handleDraggerQuadratic = () => {
+      emit('handleDraggerQua', quadraticIndex.value)
+    }
+
+    return {
+      handleDraggerQuadratic
+    }
+  }
 })
 </script>
 
