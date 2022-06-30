@@ -1,33 +1,27 @@
 <template>
   <div class="svg-dom" ref="svgDom">
     <svg :width="w" :height="h" @click="addPoints" @mousemove="handleMouseMove">
-
-      <defs>
-        <linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="rgb(98, 180, 76)" />
-          <stop offset="20%" stop-color="rgb(242, 179, 61)" />
-          <stop offset="40%" stop-color="rgb(238, 125, 55)" />
-          <stop offset="60%" stop-color="rgb(205, 58, 71)" />
-          <stop offset="80%" stop-color="rgb(142, 61, 140)" />
-          <stop offset="100%" stop-color="rgb(39, 155, 213)" />
-        </linearGradient>
-      </defs>
-
       <g :class="{'hidden': !show}" class="add-g">
-        <line v-for="(item, index) in Math.round(w/size)" :key="index" :x1="item*size" :y1="0" :x2="item*size" :y2="h">
+        <!-- x -->
+        <line v-for="(item, index) in Math.round(w/size)" :key="index" :x1="item*size" :y1="0 + h/3" :x2="item*size" :y2="h*2/3">
         </line>
-        <line v-for="(item, index) in Math.round(h/size)" :key="index" :x1="0" :y1="item*size" :y2="item*size" :x2="w">
+        <line :x1="0" :y1="h/3 - 50" :x2="0" :y2="h*2/3" style="stroke-width: 2px; stroke: #000">
         </line>
+        <polyline :points="`-30 ${h/3-10}, 0 ${h/3-50}, 30 ${h/3-10}`" style="stroke-width: 2px; stroke: #000"></polyline>
+        <!-- y -->
+        <line v-for="(item, index) in Math.round(h/size)" :class="{'hidden': item*size < h /3 || item*size > 2*h/3}" :key="index" :x1="0" :y1="item*size " :x2="w" :y2="item*size "></line>
+        <line :x1="0" :y1="2*h/3" :x2="w + 50" :y2="h*2/3" style="stroke-width: 2px; stroke: #000">
+        </line>
+        <polyline :points="`${w +10} ${h*2/3 - 30}, ${w + 50} ${h*2/3}, ${w + 10} ${h*2/3 + 30}`" style="stroke-width: 2px; stroke: #000"></polyline>
       </g>
       <!-- path -->
-      <path class="path" fill="url(#linear)" :d="path">
+      <path class="path" :d="path">
       </path>
       <!-- points -->
       <g>
         <g v-for="(item, index) in points" :key="index" :class="{'point-active': activePoint - 1 === index }">
-          <circle :cx="item.x" :cy="item.y" r="8" class="point" @mousedown="handlePointDragger(index)"></circle>
-          <cubic v-if="item.c" @handleSetCubic="handleSetCubic" :cubicIndex="index"  :x1="item.c[0].x" :y1="item.c[0].y" :x2="item.c[1].x" :y2="item.c[1].y" :p1x="points[index-1].x" :p1y="points[index-1].y" :p2x="points[index].x" :p2y="points[index].y" />
-          <quadratic v-if="item.q" @handleDraggerQua="handleDraggerQua" :quadraticIndex="index" :p1x="points[index - 1].x" :p1y="points[index-1].y" :p2x="item.x" :p2y="item.y" :x="item.q.x" :y="item.q.y"></quadratic>
+          <circle :cx="item.x" :cy="item.y" r="6" class="point" @mousedown="handlePointDragger(index)"></circle>
+          <cubic v-if="item.c" @handleSetCubic="handleSetCubic" :cubicIndex="index" :x1="item.c[0].x" :y1="item.c[0].y" :x2="item.c[1].x" :y2="item.c[1].y" :p1x="points[index-1].x" :p1y="points[index-1].y" :p2x="points[index].x" :p2y="points[index].y" />
         </g>
       </g>
     </svg>
@@ -40,8 +34,6 @@ import { throttle } from 'lodash'
 import { toRefs, onMounted, ref, onUnmounted } from 'vue'
 // 二次贝塞尔曲线控制柄
 import cubic from './Cubic.vue'
-// 三次贝塞尔曲线控制柄
-import Quadratic from './Quadratic.vue'
 // point
 export default {
   props: {
@@ -58,14 +50,11 @@ export default {
     activePoint: Number,
     // 是否拖拽点
     draggedPoint: Boolean,
-    // 是否拖拽二次贝塞尔曲线控制柄
-    draggedQuadratic: Boolean,
     // 是否拖拽三次贝塞尔曲线控制柄
     draggedCubic: [Boolean, Number]
   },
   components: {
-    cubic,
-    Quadratic
+    cubic
   },
   setup (props, { emit }) {
     const svgDom = ref(null)
@@ -79,11 +68,12 @@ export default {
     onUnmounted(() => {
       window.removeEventListener('resize', resize)
     })
+    // 边界条件限制
+    const { w, h } = toRefs(props)
     // grid 信息
     const { show, snap, size } = toRefs(props.grid)
     // ctrl
-    const { ctrl, draggedPoint, draggedQuadratic, draggedCubic } =
-      toRefs(props)
+    const { ctrl, draggedPoint, draggedCubic } = toRefs(props)
     // 处理添加点逻辑
     const addPoints = (e) => {
       if (ctrl.value) {
@@ -115,8 +105,6 @@ export default {
         // 如果是拖拽点
         if (draggedPoint.value) {
           setPointCoords(getAddMouse(e))
-        } else if (draggedQuadratic.value) {
-          setQuadraticCoords(getAddMouse(e))
         } else if (draggedCubic.value !== false) {
           setCubicCoords(getAddMouse(e))
         }
@@ -128,27 +116,19 @@ export default {
       emit('handlePointDragger', index)
     }
 
-    // 处理二次贝塞尔曲线控制点拖拽
-    const handleDraggerQua = (index) => {
-      emit('handleDraggerQua', index)
-    }
-
     const handleSetCubic = (value) => {
       emit('handleSetCubic', value)
     }
 
     // 改变原坐标点为拖拽后的坐标点
     const setPointCoords = (value) => {
+      if (value.x > w.value || value.x < 0 || value.y > h.value * 2 / 3 || value.y < h.value / 3) return
       emit('setPointValue', value)
-    }
-
-    // 处理二次贝塞尔控制点拖拽坐标
-    const setQuadraticCoords = (value) => {
-      emit('setQuadraticPointValue', value)
     }
 
     // 处理三次贝塞儿控制点坐标
     const setCubicCoords = (value) => {
+      if (value.x > w.value || value.x < 0) return
       emit('setCubicCoords', value)
     }
 
@@ -160,7 +140,6 @@ export default {
       svgDom,
       handleMouseMove,
       handlePointDragger,
-      handleDraggerQua,
       handleSetCubic
     }
   }
@@ -172,7 +151,6 @@ svg {
   display: block;
   overflow: visible;
   background-color: #fff;
-  border: 1px solid #eee;
 }
 .add-g {
   fill: none;
@@ -187,7 +165,7 @@ svg {
   cursor: pointer;
   fill: #fff;
   stroke: #555;
-  stroke-width: 5px;
+  stroke-width: 2px;
   transition: fill 0.2s;
 }
 
@@ -197,11 +175,9 @@ svg {
 
 .path {
   stroke: #555;
-  stroke-width: 4px;
+  stroke-width: 3px;
   stroke-linecap: round;
   fill: none;
-  // stroke-dasharray: 30% 70%;
-  // animation: stroke 2.5s infinite linear;
 }
 
 @keyframes stroke {

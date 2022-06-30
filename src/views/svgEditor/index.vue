@@ -1,32 +1,11 @@
 <template>
   <div class="canvas-container flex-row" @mouseup="cancleDragger">
     <div class="canvas flex-row fill-flex">
-      <canvas-box :w="w" :h="h" :grid="grid"
-      :path="generatepath" :ctrl="ctrl"
-      :points="points" @addPoint="addPoint"
-      :activePoint="activePoint"
-      :draggedPoint="draggedPoint"
-      :draggedQuadratic="draggedQuadratic"
-      :draggedCubic="draggedCubic"
-      @setPointValue="setPointValue"
-      @setQuadraticPointValue="setQuadraticPointValue"
-      @setCubicCoords="setCubicCoords"
-      @handlePointDragger="handlePointDragger"
-      @handleDraggerQua="handleDraggerQua"
-      @handleSetCubic="handleSetCubic"
-      ></canvas-box>
+      <canvas-box :w="w" :h="h" :grid="grid" :path="generatepath" :ctrl="ctrl" :points="points" @addPoint="addPoint" :activePoint="activePoint" :draggedPoint="draggedPoint" :draggedCubic="draggedCubic" @setPointValue="setPointValue" @setCubicCoords="setCubicCoords" @handlePointDragger="handlePointDragger" @handleSetCubic="handleSetCubic"></canvas-box>
     </div>
 
     <div class="control-panel flex-row">
-      <controls
-      v-model:w="w"
-      v-model:h="h"
-      :path="generatepath"
-      v-model:size="grid.size"
-      v-model:show="grid.show"
-      @handleRPath="handleRPath"
-      @handleType="handleLineType"
-      :lineType="lineType">
+      <controls :path="generatepath" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType">
       </controls>
     </div>
   </div>
@@ -39,8 +18,6 @@ import {
   reactive,
   onUnmounted,
   toRefs,
-  watch,
-  ref,
   computed
 } from 'vue'
 import Controls from './controls.vue'
@@ -53,21 +30,35 @@ export default defineComponent({
   setup () {
     // 状态定义
     const state = reactive({
-      w: 800,
-      h: 800,
+      w: 500,
+      h: 1500,
       grid: {
         show: true,
         snap: true,
-        size: 50
+        size: 10
       },
       ctrl: false,
-      points: [],
+      points: [
+        {
+          x: 0,
+          y: 1000
+        },
+        // { x: 140, y: 620, c: [{ x: 160, y: 850 }, { x: 160, y: 850 }] },
+        {
+          x: 500,
+          y: 500,
+          c: [
+            { x: 0, y: 1000 },
+            { x: 500, y: 500 }
+          ]
+        }
+      ],
       activePoint: 0,
       draggedPoint: false,
-      draggedQuadratic: false,
       draggedCubic: false,
-      closePath: false,
-      lineType: 'Q'
+      lineType: 'C',
+      // 是否移动了终点坐标
+      lineEndMove: false
     })
 
     // 处理键盘按下
@@ -82,24 +73,29 @@ export default defineComponent({
 
     // 处理添加点
     const addPoint = (value) => {
-      // 获取新添加的点
-      state.points.push(value)
-      // 更新当前激活点下标 + 1
-      state.activePoint = state.points.length
+      if (value.y > state.h * 2 / 3 || value.y < state.h / 3) return
+      // 判断是否移动了终点坐标
+      if (state.points[state.points.length - 1].x !== state.w || state.points[state.points.length - 1].y !== state.w) {
+        state.lineEndMove = true
+        // 移动了终点，从终点之后添加坐标
+        state.points.push(value)
+        // 更新当前激活点下标 + 1 值
+        state.activePoint = state.points.length
+      } else {
+        state.lineEndMove = false
+        // 对比添加点的坐标, 介于当前存在的那两个坐标之间，将坐标添加到相应位置, 并获取下标
+        state.points.splice(state.points.length - 1, 0, value)
+
+        // 更新当前激活点下标 + 1
+        state.activePoint = state.points.length - 1
+      }
+
       createPoint()
     }
 
-    // 暂定监听重置点
-    watch(
-      () => state.grid.size,
-      (newValue, oldValue) => {
-        handleRPath()
-      }
-    )
-
     // 计算生成path
     const generatepath = computed(() => {
-      const { points, closePath } = state
+      const { points } = state
       let d = ''
 
       points.forEach((p, i) => {
@@ -113,23 +109,29 @@ export default defineComponent({
           // cubic
           d += `C ${p.c[0].x} ${p.c[0].y} ${p.c[1].x} ${p.c[1].y} `
         }
-        d += `${p.x} ${p.y} `
+        d += `${p.x} ${p.y}`
       })
-
-      if (closePath) d += 'Z'
 
       return d
     })
 
     // 处理重新绘制path
     const handleRPath = () => {
-      state.points = []
+      state.points = [
+        {
+          x: 0,
+          y: 1000
+        },
+        {
+          x: 500,
+          y: 500,
+          c: [
+            { x: 0, y: 1000 },
+            { x: 500, y: 500 }
+          ]
+        }
+      ]
       state.activePoint = 0
-    }
-
-    // 切换曲线生成类型,并根据类型生成point
-    const handleLineType = (e) => {
-      state.lineType = e.target.value
     }
 
     // 根据不同曲线类型,变化添加的点坐标
@@ -157,11 +159,11 @@ export default defineComponent({
               y: points[active].y,
               c: [
                 {
-                  x: (points[active].x + points[active - 1].x - 50) / 2,
+                  x: (points[active].x + points[active - 1].x) / 2,
                   y: (points[active].y + points[active - 1].y) / 2
                 },
                 {
-                  x: (points[active].x + points[active - 1].x + 50) / 2,
+                  x: (points[active].x + points[active - 1].x) / 2,
                   y: (points[active].y + points[active - 1].y) / 2
                 }
               ]
@@ -169,6 +171,7 @@ export default defineComponent({
             break
         }
 
+        // 更改下段曲线的c 的第一个坐标为
         state.points = points
       }
     }
@@ -177,11 +180,6 @@ export default defineComponent({
     const setPointValue = (value) => {
       state.points[state.activePoint - 1].x = value.x
       state.points[state.activePoint - 1].y = value.y
-    }
-
-    const setQuadraticPointValue = (value) => {
-      state.points[state.activePoint - 1].q.x = value.x
-      state.points[state.activePoint - 1].q.y = value.y
     }
 
     const setCubicCoords = (value) => {
@@ -195,14 +193,6 @@ export default defineComponent({
       if (!state.ctrl) {
         state.activePoint = index + 1
         state.draggedPoint = true
-      }
-    }
-
-    // 处理二次贝塞尔曲线控制点拖拽
-    const handleDraggerQua = (index) => {
-      if (!state.ctrl) {
-        state.draggedQuadratic = true
-        state.activePoint = index + 1
       }
     }
 
@@ -238,13 +228,10 @@ export default defineComponent({
       addPoint,
       generatepath,
       handleRPath,
-      handleLineType,
       setPointValue,
       handlePointDragger,
       cancleDragger,
-      handleDraggerQua,
       handleSetCubic,
-      setQuadraticPointValue,
       setCubicCoords
     }
   }
@@ -258,6 +245,7 @@ export default defineComponent({
   .canvas {
     justify-content: center;
     align-items: center;
+    overflow: hidden;
   }
 
   .control-panel {

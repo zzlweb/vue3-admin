@@ -40,11 +40,11 @@ export default defineComponent({
   cursor: pointer;
   fill: #fff;
   stroke: #888;
-  stroke-width: 5px;
+  stroke-width: 2px;
 }
 .ad-Anchor-line {
   stroke: #888;
   stroke-width: 1px;
-  stroke-dasharray: 5 5;
+  stroke-dasharray: 2 2;
 }
 </style>

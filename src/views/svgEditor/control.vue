@@ -95,7 +95,7 @@ export default defineComponent({
     type: String,
     name: String,
     value: [String, Number, Boolean],
-    max: { type: Number },
+    max: Number,
     checkboxLabel: [String],
     step: Number
   },
