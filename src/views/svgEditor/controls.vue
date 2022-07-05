@@ -11,7 +11,7 @@
     </div>
 
     <div class="path-content flex-col">
-      <div>路径坐标</div>
+      <div>运动曲线</div>
       <div class="path-box">{{path}}</div>
     </div>
 

@@ -48,8 +48,8 @@ export default defineComponent({
           x: 500,
           y: 500,
           c: [
-            { x: 0, y: 1000 },
-            { x: 500, y: 500 }
+            { x: 170, y: 930 },
+            { x: 440, y: 740 }
           ]
         }
       ],
@@ -103,6 +103,13 @@ export default defineComponent({
         d += `${p.x} ${p.y}`
       })
 
+      console.log(d)
+
+      // 将d 转换成为 cubic
+      const path = d.replace(/\s/g, '')
+
+      console.log(path)
+
       return d
     })
 
@@ -117,8 +124,8 @@ export default defineComponent({
           x: 500,
           y: 500,
           c: [
-            { x: 0, y: 1000 },
-            { x: 500, y: 500 }
+            { x: 170, y: 930 },
+            { x: 440, y: 740 }
           ]
         }
       ]
