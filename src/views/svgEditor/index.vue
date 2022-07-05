@@ -103,12 +103,19 @@ export default defineComponent({
         d += `${p.x} ${p.y}`
       })
 
-      console.log(d)
-
       // 将d 转换成为 cubic
-      const path = d.replace(/\s/g, '')
 
-      console.log(path)
+      const path = d.split(' ')
+      // 匹配到的
+      const indexArray = []
+      path.forEach((item, index) => {
+        if (item.search(/c/) !== -1) {
+          indexArray.push(index)
+        }
+      })
+
+      console.log(indexArray)
+      // const cubic = `cubic-bezier(${path[0] / 500}, ${(1000 - path[1]) / 1000}, ${path[2] / 500}, ${(1000 - path[3]) / 500})`
 
       return d
     })
