@@ -73,21 +73,13 @@ export default defineComponent({
 
     // 处理添加点
     const addPoint = (value) => {
-      if (value.y > state.h * 2 / 3 || value.y < state.h / 3) return
-      // 判断是否移动了终点坐标
-      if (state.points[state.points.length - 1].x !== state.w || state.points[state.points.length - 1].y !== state.w) {
-        state.lineEndMove = true
-        // 移动了终点，从终点之后添加坐标
-        state.points.push(value)
-        // 更新当前激活点下标 + 1 值
-        state.activePoint = state.points.length
-      } else {
-        state.lineEndMove = false
-        // 将点添加到倒数第二的位置
-        state.points.splice(state.points.length - 1, 0, value)
-        // 更新当前激活点下标 + 1
-        state.activePoint = state.points.length - 1
-      }
+      if (value.y > (state.h * 2) / 3 || value.y < state.h / 3) return
+
+      state.lineEndMove = false
+      // 将点添加到倒数第二的位置
+      state.points.splice(state.points.length - 1, 0, value)
+      // 更新当前激活点下标 + 1
+      state.activePoint = state.points.length - 1
 
       createPoint()
     }
@@ -143,6 +135,7 @@ export default defineComponent({
 
         switch (v) {
           case 'C':
+            // 判断前一段是否为起点
             points[active] = {
               x: points[active].x,
               y: points[active].y,
@@ -160,31 +153,29 @@ export default defineComponent({
             }
             break
         }
+        // 求镜像坐标
+        points[active + 1].c[0].x = getMirrorPoint(
+          { x: points[active].x, y: points[active].y },
+          { x: points[active].c[1].x, y: points[active].c[1].y }, state.w
+        ).x
+        points[active + 1].c[0].y = getMirrorPoint(
+          { x: points[active].x, y: points[active].y },
+          { x: points[active].c[1].x, y: points[active].c[1].y }, state.w
+        ).y
 
-        // // 添加点,新生成的点会是平滑的曲线,会取自身的第二个控制点 以及前一个曲线的第一个控制点作为控制柄
-        // // 新生成点的第一个控制点会平行于前一个点的第二个控制点
-        // // 需要更改前一个曲线的第一个控制点  控制点相对激活点位于第三象限
-        // if ((points[active].y <= points[active].c[1].y) && (points[active].x >= points[active].c[1].x)) {
-        //   points[active + 1].c[0].x = 2 * points[active].x - points[active].c[1].x
-        //   points[active + 1].c[0].y = points[active].y - (points[active].c[1].y - points[active].y)
-        //   // 边界条件限制
-        //   if (points[active + 1].c[0].x > state.w) {
-        //     points[active + 1].c[0].y = points[active].y - Math.round((state.w - points[active].x) / ((points[active].x - points[active].c[1].x) / (points[active].c[1].y - points[active].y)))
-        //     points[active + 1].c[0].x = state.w
-        //   }
-        //   // 控制点相对于新增点位于第四象限
-        // } else if ((points[active].y >= points[active].c[1].y) && (points[active].x >= points[active].c[1].x)) {
-        //   console.log('触发条件')
-
-        //   points[active + 1].c[0].x = 2 * points[active].x - points[active].c[1].x
-        //   points[active + 1].c[0].y = points[active].y + (points[active].y - points[active].c[1].y)
-
-        //   // 边界条件限制
-        //   if (points[active + 1].c[0].x > state.w) {
-        //     points[active + 1].c[0].y = points[active].y + Math.round((state.w - points[active].x) / ((points[active].x - points[active].c[1].x) / (points[active].y - points[active].c[1].y)))
-        //     points[active + 1].c[0].x = state.w
-        //   }
-        // }
+        // 判断是否为起点
+        if (points[active - 1].c) {
+          points[active].c[0].x = getMirrorPoint(
+            { x: points[active - 1].x, y: points[active - 1].y },
+            { x: points[active - 1].c[1].x, y: points[active - 1].c[1].y },
+            state.w
+          ).x
+          points[active].c[0].y = getMirrorPoint(
+            { x: points[active - 1].x, y: points[active - 1].y },
+            { x: points[active - 1].c[1].x, y: points[active - 1].c[1].y },
+            state.w
+          ).y
+        }
 
         state.points = points
       }
@@ -192,13 +183,45 @@ export default defineComponent({
 
     // 拖拽后坐标改变,  同步值到 state
     const setPointValue = (value) => {
+      // 需要补充逻辑，如果为起点或终点坐标不移动
+      if (state.activePoint - 1 === 0 || state.activePoint === state.points.length) {
+        return
+      }
+      // 获取偏移相对值， 同步到相应的手柄
+      const x = parseInt(value.x - state.points[state.activePoint - 1].x)
+      const y = parseInt(value.y - state.points[state.activePoint - 1].y)
+
+      state.points[state.activePoint - 1].c[1].x += x
+      state.points[state.activePoint - 1].c[1].y += y
+
       state.points[state.activePoint - 1].x = value.x
       state.points[state.activePoint - 1].y = value.y
+
+      state.points[state.activePoint].c[0].x += x
+      state.points[state.activePoint].c[0].y += y
     }
 
     const setCubicCoords = (value) => {
       state.points[state.activePoint - 1].c[state.draggedCubic].x = value.x
       state.points[state.activePoint - 1].c[state.draggedCubic].y = value.y
+
+      // 同等改变镜像手柄的坐标值 ,并且不是起点坐标或者终点坐标
+      if (state.points.length >= 2) {
+        if (!(state.activePoint - 2 === 0 && state.draggedCubic === 0) || !(state.activePoint === state.points.length && state.draggedCubic === 1)) {
+        // 拖动点为第一个控制点
+          if (state.draggedCubic === 0) {
+            if (state.points[state.activePoint - 2].c) {
+              state.points[state.activePoint - 2].c[1].x = getMirrorPoint({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: value.x, y: value.y }, state.w).x
+              state.points[state.activePoint - 2].c[1].y = getMirrorPoint({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: value.x, y: value.y }, state.w).y
+            }
+          } else {
+            if (state.points[state.activePoint]) {
+              state.points[state.activePoint].c[0].x = getMirrorPoint({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: value.x, y: value.y }, state.w).x
+              state.points[state.activePoint].c[0].y = getMirrorPoint({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: value.x, y: value.y }, state.w).y
+            }
+          }
+        }
+      }
     }
 
     // 处理拖拽点逻辑

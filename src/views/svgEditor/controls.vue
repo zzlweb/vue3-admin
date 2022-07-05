@@ -14,6 +14,8 @@
       <div>路径坐标</div>
       <div class="path-box">{{path}}</div>
     </div>
+
+    <div class="effect-box"></div>
   </div>
 </template>
 
@@ -97,4 +99,16 @@ export default defineComponent({
     height: 100px;
   }
 }
+
+.effect-box {
+  width: 30px;
+  height: 30px;
+  background: #00a971;
+  margin-left: 10px;
+  transition: all 3s ease-in-out;
+}
+
+// .effect-box:hover {
+//   transform: translateX(200px);
+// }
 </style>
