@@ -122,7 +122,12 @@ export default {
 
     // 改变原坐标点为拖拽后的坐标点
     const setPointCoords = (value) => {
-      if (value.x > w.value || value.x < 0 || value.y > h.value * 2 / 3 || value.y < h.value / 3) return
+      if (
+        value.x > w.value ||
+        value.x < 0 ||
+        value.y > (h.value * 2) / 3 ||
+        value.y < h.value / 3
+      ) { return }
       emit('setPointValue', value)
     }
 

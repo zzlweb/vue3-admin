@@ -25,8 +25,6 @@ export default defineComponent({
     control
   },
   props: {
-    // w: Number,
-    // h: Number,
     size: Number,
     show: Boolean,
     path: String

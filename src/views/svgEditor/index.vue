@@ -1,5 +1,5 @@
 <template>
-  <div class="canvas-container flex-row" @mouseup="cancleDragger">
+  <div class="canvas-container flex-row" @mouseup="cancleDragger" @mouseleave="cancleDragger">
     <div class="canvas flex-row fill-flex">
       <canvas-box :w="w" :h="h" :grid="grid" :path="generatepath" :ctrl="ctrl" :points="points" @addPoint="addPoint" :activePoint="activePoint" :draggedPoint="draggedPoint" :draggedCubic="draggedCubic" @setPointValue="setPointValue" @setCubicCoords="setCubicCoords" @handlePointDragger="handlePointDragger" @handleSetCubic="handleSetCubic"></canvas-box>
     </div>
@@ -22,6 +22,7 @@ import {
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
+import { getMirrorPoint } from './utils'
 export default defineComponent({
   components: {
     Controls,
@@ -43,7 +44,6 @@ export default defineComponent({
           x: 0,
           y: 1000
         },
-        // { x: 140, y: 620, c: [{ x: 160, y: 850 }, { x: 160, y: 850 }] },
         {
           x: 500,
           y: 500,
@@ -83,9 +83,8 @@ export default defineComponent({
         state.activePoint = state.points.length
       } else {
         state.lineEndMove = false
-        // 对比添加点的坐标, 介于当前存在的那两个坐标之间，将坐标添加到相应位置, 并获取下标
+        // 将点添加到倒数第二的位置
         state.points.splice(state.points.length - 1, 0, value)
-
         // 更新当前激活点下标 + 1
         state.activePoint = state.points.length - 1
       }
@@ -143,16 +142,6 @@ export default defineComponent({
         const v = state.lineType
 
         switch (v) {
-          case 'Q':
-            points[active] = {
-              x: points[active].x,
-              y: points[active].y,
-              q: {
-                x: (points[active].x + points[active - 1].x - 50) / 2,
-                y: (points[active].y + points[active - 1].y) / 2
-              }
-            }
-            break
           case 'C':
             points[active] = {
               x: points[active].x,
@@ -160,18 +149,43 @@ export default defineComponent({
               c: [
                 {
                   x: (points[active].x + points[active - 1].x) / 2,
-                  y: (points[active].y + points[active - 1].y) / 2
+                  y: (points[active].y + points[active - 1].y) / 2 + 50
                 },
+                // 前一个点的第一个控制点的对称点
                 {
                   x: (points[active].x + points[active - 1].x) / 2,
-                  y: (points[active].y + points[active - 1].y) / 2
+                  y: (points[active].y + points[active - 1].y) / 2 - 50
                 }
               ]
             }
             break
         }
 
-        // 更改下段曲线的c 的第一个坐标为
+        // // 添加点,新生成的点会是平滑的曲线,会取自身的第二个控制点 以及前一个曲线的第一个控制点作为控制柄
+        // // 新生成点的第一个控制点会平行于前一个点的第二个控制点
+        // // 需要更改前一个曲线的第一个控制点  控制点相对激活点位于第三象限
+        // if ((points[active].y <= points[active].c[1].y) && (points[active].x >= points[active].c[1].x)) {
+        //   points[active + 1].c[0].x = 2 * points[active].x - points[active].c[1].x
+        //   points[active + 1].c[0].y = points[active].y - (points[active].c[1].y - points[active].y)
+        //   // 边界条件限制
+        //   if (points[active + 1].c[0].x > state.w) {
+        //     points[active + 1].c[0].y = points[active].y - Math.round((state.w - points[active].x) / ((points[active].x - points[active].c[1].x) / (points[active].c[1].y - points[active].y)))
+        //     points[active + 1].c[0].x = state.w
+        //   }
+        //   // 控制点相对于新增点位于第四象限
+        // } else if ((points[active].y >= points[active].c[1].y) && (points[active].x >= points[active].c[1].x)) {
+        //   console.log('触发条件')
+
+        //   points[active + 1].c[0].x = 2 * points[active].x - points[active].c[1].x
+        //   points[active + 1].c[0].y = points[active].y + (points[active].y - points[active].c[1].y)
+
+        //   // 边界条件限制
+        //   if (points[active + 1].c[0].x > state.w) {
+        //     points[active + 1].c[0].y = points[active].y + Math.round((state.w - points[active].x) / ((points[active].x - points[active].c[1].x) / (points[active].y - points[active].c[1].y)))
+        //     points[active + 1].c[0].x = state.w
+        //   }
+        // }
+
         state.points = points
       }
     }
