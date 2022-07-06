@@ -8,14 +8,15 @@
       <!--  重置路径  -->
       <control :type="'button'" :value="'Rwrite'" @update:value="handleRPath" name="重置路径">
       </control>
+      <!-- 设置时间 -->
     </div>
 
     <div class="path-content flex-col">
       <div>运动曲线</div>
-      <div class="path-box">{{path}}</div>
+      <div class="path-box" >{{path}}</div>
     </div>
 
-    <div class="effect-box"></div>
+    <div class="effect-box" :style="`transition: all 3s ${path}`"></div>
   </div>
 </template>
 
@@ -93,10 +94,6 @@ export default defineComponent({
 
   .path-box {
     width: 100%;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    overflow: scroll;
-    height: 100px;
   }
 }
 
@@ -105,10 +102,9 @@ export default defineComponent({
   height: 30px;
   background: #00a971;
   margin-left: 10px;
-  transition: all 3s ease-in-out;
 }
 
-// .effect-box:hover {
-//   transform: translateX(200px);
-// }
+.effect-box:hover {
+  transform: translateX(200px);
+}
 </style>

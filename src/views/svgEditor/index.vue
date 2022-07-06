@@ -5,7 +5,7 @@
     </div>
 
     <div class="control-panel flex-row">
-      <controls :path="generatepath" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType">
+      <controls :path="cubicValue" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType">
       </controls>
     </div>
   </div>
@@ -48,8 +48,8 @@ export default defineComponent({
           x: 500,
           y: 500,
           c: [
-            { x: 170, y: 930 },
-            { x: 440, y: 740 }
+            { x: 0, y: 1000 },
+            { x: 500, y: 500 }
           ]
         }
       ],
@@ -63,8 +63,9 @@ export default defineComponent({
 
     // 处理键盘按下
     const handleKeyDown = (e) => {
+      console.log(e)
       // 判断是否点击ctrl
-      if (e.ctrlKey) state.ctrl = true
+      if (e.keyCode === 17 || (e.key === 'Meta' && e.keyCode === 91)) state.ctrl = true
     }
     // 处理键盘抬起
     const handleKeyUp = (e) => {
@@ -93,31 +94,39 @@ export default defineComponent({
         if (i === 0) {
           // first point
           d += 'M '
-        } else if (p.q) {
-          // quadratic
-          d += `Q ${p.q.x} ${p.q.y} `
         } else if (p.c) {
           // cubic
           d += `C ${p.c[0].x} ${p.c[0].y} ${p.c[1].x} ${p.c[1].y} `
         }
         d += `${p.x} ${p.y}`
       })
+      return d
+    })
 
+    // 计算cubic
+    const cubicValue = computed(() => {
+      let cubic = ''
       // 将d 转换成为 cubic
-
-      const path = d.split(' ')
+      const path = generatepath.value.split(' ')
       // 匹配到的
       const indexArray = []
       path.forEach((item, index) => {
-        if (item.search(/c/) !== -1) {
+        if (item.indexOf('C') !== -1) {
           indexArray.push(index)
         }
       })
+      const cubicArray = []
+      indexArray.forEach(item => {
+        cubicArray.push(path.slice(item + 1, item + 5).map(Number))
+      })
 
-      console.log(indexArray)
-      // const cubic = `cubic-bezier(${path[0] / 500}, ${(1000 - path[1]) / 1000}, ${path[2] / 500}, ${(1000 - path[3]) / 500})`
+      cubicArray.forEach(item => {
+        cubic += `cubic-bezier(${item[0] / 500}, ${(1000 - item[1]) / 500}, ${item[2] / 500}, ${(1000 - item[3]) / 500}),`
+      })
 
-      return d
+      cubic = cubic.substr(0, cubic.length - 1)
+
+      return cubic
     })
 
     // 处理重新绘制path
@@ -131,8 +140,8 @@ export default defineComponent({
           x: 500,
           y: 500,
           c: [
-            { x: 170, y: 930 },
-            { x: 440, y: 740 }
+            { x: 0, y: 1000 },
+            { x: 500, y: 500 }
           ]
         }
       ]
@@ -150,21 +159,40 @@ export default defineComponent({
         switch (v) {
           case 'C':
             // 判断前一段是否为起点
-            points[active] = {
-              x: points[active].x,
-              y: points[active].y,
-              c: [
-                {
-                  x: (points[active].x + points[active - 1].x) / 2,
-                  y: (points[active].y + points[active - 1].y) / 2 + 50
-                },
-                // 前一个点的第一个控制点的对称点
-                {
-                  x: (points[active].x + points[active - 1].x) / 2,
-                  y: (points[active].y + points[active - 1].y) / 2 - 50
-                }
-              ]
+            if (active === 1) {
+              points[active] = {
+                x: points[active].x,
+                y: points[active].y,
+                c: [
+                  {
+                    x: 0,
+                    y: state.h * 2 / 3
+                  },
+                  // 前一个点的第一个控制点的对称点
+                  {
+                    x: (points[active].x + points[active - 1].x) / 2,
+                    y: (points[active].y + points[active - 1].y) / 2 - 50
+                  }
+                ]
+              }
+            } else {
+              points[active] = {
+                x: points[active].x,
+                y: points[active].y,
+                c: [
+                  {
+                    x: (points[active].x + points[active - 1].x) / 2,
+                    y: (points[active].y + points[active - 1].y) / 2 + 50
+                  },
+                  // 前一个点的第一个控制点的对称点
+                  {
+                    x: (points[active].x + points[active - 1].x) / 2,
+                    y: (points[active].y + points[active - 1].y) / 2 - 50
+                  }
+                ]
+              }
             }
+
             break
         }
         // 求镜像坐标
@@ -283,7 +311,8 @@ export default defineComponent({
       handlePointDragger,
       cancleDragger,
       handleSetCubic,
-      setCubicCoords
+      setCubicCoords,
+      cubicValue
     }
   }
 })

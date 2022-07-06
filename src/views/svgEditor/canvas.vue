@@ -15,8 +15,10 @@
         <polyline :points="`${w +10} ${h*2/3 - 30}, ${w + 50} ${h*2/3}, ${w + 10} ${h*2/3 + 30}`" style="stroke-width: 2px; stroke: #000"></polyline>
       </g>
       <!-- path -->
-      <path class="path" :d="path">
+      <path class="path" :d="path" id="path">
+
       </path>
+
       <!-- points -->
       <g>
         <g v-for="(item, index) in points" :key="index" :class="{'point-active': activePoint - 1 === index }">
