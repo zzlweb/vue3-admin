@@ -5,7 +5,7 @@
     </div>
 
     <div class="control-panel flex-row">
-      <controls :path="cubicValue" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType">
+      <controls :path="cubicValue" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType">
       </controls>
     </div>
   </div>
@@ -22,7 +22,7 @@ import {
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
-import { getMirrorPoint } from './utils'
+import { getMirrorPoint, getAnglePoint, getDistance } from './utils'
 export default defineComponent({
   components: {
     Controls,
@@ -58,12 +58,13 @@ export default defineComponent({
       draggedCubic: false,
       lineType: 'C',
       // 是否移动了终点坐标
-      lineEndMove: false
+      lineEndMove: false,
+      // 当前手柄的拖动呈现方式
+      mosueType: 4
     })
 
     // 处理键盘按下
     const handleKeyDown = (e) => {
-      console.log(e)
       // 判断是否点击ctrl
       if (e.keyCode === 17 || (e.key === 'Meta' && e.keyCode === 91)) state.ctrl = true
     }
@@ -158,7 +159,7 @@ export default defineComponent({
 
         switch (v) {
           case 'C':
-            // 判断前一段是否为起点
+            // 判断前一段是否为起点, 如果是起点控制手柄为原点
             if (active === 1) {
               points[active] = {
                 x: points[active].x,
@@ -243,6 +244,7 @@ export default defineComponent({
       state.points[state.activePoint].c[0].y += y
     }
 
+    // 拖拽手柄改变坐标
     const setCubicCoords = (value) => {
       state.points[state.activePoint - 1].c[state.draggedCubic].x = value.x
       state.points[state.activePoint - 1].c[state.draggedCubic].y = value.y
@@ -253,13 +255,38 @@ export default defineComponent({
         // 拖动点为第一个控制点
           if (state.draggedCubic === 0) {
             if (state.points[state.activePoint - 2].c) {
-              state.points[state.activePoint - 2].c[1].x = getMirrorPoint({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: value.x, y: value.y }, state.w).x
-              state.points[state.activePoint - 2].c[1].y = getMirrorPoint({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: value.x, y: value.y }, state.w).y
+              if (state.mosueType === 4) {
+                state.points[state.activePoint - 2].c[1].x = getMirrorPoint({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: value.x, y: value.y }, state.w).x
+                state.points[state.activePoint - 2].c[1].y = getMirrorPoint({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: value.x, y: value.y }, state.w).y
+              } else if (state.mosueType === 3) {
+                const { degrees } = getAnglePoint({ x: value.x, y: value.y }, { x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y })
+                const radius = getDistance({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: state.points[state.activePoint - 2].c[1].x, y: state.points[state.activePoint - 2].c[1].y })
+
+                state.points[state.activePoint - 2].c[1].x = state.points[state.activePoint - 2].x - radius * Math.cos((degrees * Math.PI) / 180)
+                state.points[state.activePoint - 2].c[1].y = state.points[state.activePoint - 2].y - radius * Math.sin((degrees * Math.PI) / 180)
+              } else if (state.mosueType === 1) {
+                state.points[state.activePoint - 2].c[1].x = state.points[state.activePoint - 2].x
+                state.points[state.activePoint - 2].c[1].y = state.points[state.activePoint - 2].y
+              } else {
+                state.mosueType = 2
+              }
             }
           } else {
             if (state.points[state.activePoint]) {
-              state.points[state.activePoint].c[0].x = getMirrorPoint({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: value.x, y: value.y }, state.w).x
-              state.points[state.activePoint].c[0].y = getMirrorPoint({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: value.x, y: value.y }, state.w).y
+              if (state.mosueType === 4) {
+                state.points[state.activePoint].c[0].x = getMirrorPoint({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: value.x, y: value.y }, state.w).x
+                state.points[state.activePoint].c[0].y = getMirrorPoint({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: value.x, y: value.y }, state.w).y
+              } else if (state.mosueType === 3) {
+                const { degrees } = getAnglePoint({ x: value.x, y: value.y }, { x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y })
+                const radius = getDistance({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: state.points[state.activePoint].c[0].x, y: state.points[state.activePoint].c[0].y })
+                state.points[state.activePoint].c[0].x = state.points[state.activePoint - 1].x - radius * Math.cos((degrees * Math.PI) / 180)
+                state.points[state.activePoint].c[0].y = state.points[state.activePoint - 1].y - radius * Math.sin((degrees * Math.PI) / 180)
+              } else if (state.mosueType === 1) {
+                state.points[state.activePoint].c[0].x = state.points[state.activePoint - 1].x
+                state.points[state.activePoint].c[0].y = state.points[state.activePoint - 1].y
+              } else {
+                state.mosueType = 2
+              }
             }
           }
         }

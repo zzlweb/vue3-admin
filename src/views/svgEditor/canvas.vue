@@ -16,7 +16,6 @@
       </g>
       <!-- path -->
       <path class="path" :d="path" id="path">
-
       </path>
 
       <!-- points -->

@@ -11,6 +11,15 @@
       <!-- 设置时间 -->
     </div>
 
+    <div class="control-box flex-row">
+      <a-radio-group v-model:value="value">
+        <a-radio :style="radioStyle" :value="1">无手柄</a-radio>
+        <a-radio :style="radioStyle" :value="2">不等长不等角度</a-radio>
+        <a-radio :style="radioStyle" :value="3">等角度</a-radio>
+        <a-radio :style="radioStyle" :value="4">等长等角度</a-radio>
+      </a-radio-group>
+    </div>
+
     <div class="path-content flex-col">
       <div>运动曲线</div>
       <div class="path-box" >{{path}}</div>
@@ -21,7 +30,7 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs } from 'vue'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 import control from './control.vue'
 export default defineComponent({
   components: {
@@ -30,23 +39,25 @@ export default defineComponent({
   props: {
     size: Number,
     show: Boolean,
-    path: String
+    path: String,
+    mosueType: Number
   },
   setup (props, { emit }) {
-    const { path } = toRefs(props)
+    const { path, mosueType } = toRefs(props)
 
     // range
     const state = reactive({
-      // // range
-      // range: { value: 0, name: '调整范围' },
-      // // text
-      // text: { value: '' },
-      // // button
-      // button: { value: '删除' },
-      // // checkbox
-      // checkbox: { value: true, checkboxLabel: '确定' },
-      // radio: { value: 1 }
+      radioStyle: {
+        height: '30px',
+        display: 'flex',
+        alignItems: 'center'
+      },
+      value: mosueType.value
     })
+
+    watch(() => state.value, (current, oldValue) => {
+      emit('update:mosueType', current)
+    }, { immediate: true })
 
     // 处理显示画布
     const handleShow = (value) => {
@@ -74,6 +85,7 @@ export default defineComponent({
 
   .control-box {
     justify-content: space-between;
+    margin: 10px ;
 
     .control-item {
       width: 50%;
