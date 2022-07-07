@@ -10,7 +10,12 @@
       </control>
       <!-- 设置时间 -->
     </div>
+    <!-- 动画执行时长 -->
+    <div class="control-box flex-row">
+      <a-input-number id="inputNumber" :value="time" @change="handleTime" :min="1" :max="10" />
+    </div>
 
+    <!-- 选择手柄样式 -->
     <div class="control-box flex-row">
       <a-radio-group v-model:value="value">
         <a-radio :style="radioStyle" :value="1">无手柄</a-radio>
@@ -25,12 +30,12 @@
       <div class="path-box" >{{path}}</div>
     </div>
 
-    <div class="effect-box" :style="`transition: all 3s ${path}`"></div>
+    <div class="effect-box" :style="FixedPath"></div>
   </div>
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, watch } from 'vue'
+import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
 import control from './control.vue'
 export default defineComponent({
   components: {
@@ -40,10 +45,11 @@ export default defineComponent({
     size: Number,
     show: Boolean,
     path: String,
-    mosueType: Number
+    mosueType: Number,
+    time: Number
   },
   setup (props, { emit }) {
-    const { path, mosueType } = toRefs(props)
+    const { path, mosueType, time } = toRefs(props)
 
     // range
     const state = reactive({
@@ -69,11 +75,31 @@ export default defineComponent({
       emit('handleRPath')
     }
 
+    // 处理动画时间
+    const handleTime = (value) => {
+      if (typeof value === 'number') {
+        emit('update:time', value)
+      }
+    }
+
+    // 处理动画cubic拼接
+    const FixedPath = computed(() => {
+      let result = ''
+      path.value.split('/').map(item => {
+        result += ` all ${time.value}s ${item} ,`
+      })
+      result = ('transition:' + result)
+      result = result.slice(0, result.length - 1)
+      return result
+    })
+
     return {
       ...toRefs(state),
       handleShow,
       handleRPath,
-      path
+      handleTime,
+      path,
+      FixedPath
     }
   }
 })
