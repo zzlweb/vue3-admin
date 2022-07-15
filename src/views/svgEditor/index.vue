@@ -18,11 +18,13 @@ import {
   reactive,
   onUnmounted,
   toRefs,
-  computed
+  computed,
+  watch
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
 import { getMirrorPoint, getAnglePoint, getDistance } from './utils'
+
 export default defineComponent({
   components: {
     Controls,
@@ -329,6 +331,22 @@ export default defineComponent({
       state.draggedQuadratic = false
       state.draggedCubic = false
     }
+
+    // 监听mouseType变化 , 如果手柄状态值为1 无手柄状态，设置当前激活点手柄值为激活点值
+    watch(() => state.mosueType, (value, oldValue) => {
+      if (value === 1) {
+        if (state.points.length >= 2) {
+          // if (!(state.activePoint - 2 === 0 && state.draggedCubic === 0) || !(state.activePoint === state.points.length && state.draggedCubic === 1)) {
+          //   // 无手柄
+          //   state.points[state.activePoint - 2].c[1].x = state.points[state.activePoint - 2].x
+          //   state.points[state.activePoint - 2].c[1].y = state.points[state.activePoint - 2].y
+
+          //   state.points[state.activePoint].c[0].x = state.points[state.activePoint - 1].x
+          //   state.points[state.activePoint].c[0].y = state.points[state.activePoint - 1].y
+          // }
+        }
+      }
+    })
 
     onMounted(() => {
       document.addEventListener('keydown', handleKeyDown, false)
