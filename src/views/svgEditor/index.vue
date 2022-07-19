@@ -5,7 +5,7 @@
     </div>
 
     <div class="control-panel flex-row">
-      <controls :path="cubicValue" v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType">
+      <controls  v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType">
       </controls>
     </div>
   </div>
@@ -23,7 +23,7 @@ import {
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
-import { getMirrorPoint, getAnglePoint, getDistance } from './utils'
+import { getMirrorPoint, getAnglePoint, getDistance, Bezier } from './utils'
 
 export default defineComponent({
   components: {
@@ -33,14 +33,19 @@ export default defineComponent({
   setup () {
     // 状态定义
     const state = reactive({
+      // 画布宽高
       w: 500,
       h: 1500,
+      // 画布设置
       grid: {
+        // 是否显示画布
         show: true,
-        snap: true,
+        // 画布单位
         size: 10
       },
+      // 是否按下ctrl
       ctrl: false,
+      // 初始设置点坐标
       points: [
         {
           x: 0,
@@ -55,14 +60,19 @@ export default defineComponent({
           ]
         }
       ],
+      // 当前激活点坐标
       activePoint: 0,
+      // 是否拖拽点
       draggedPoint: false,
+      // 是否拖拽手柄
       draggedCubic: false,
+      // 曲线模式三次贝塞尔曲线
       lineType: 'C',
       // 是否移动了终点坐标
       lineEndMove: false,
       // 当前手柄的拖动呈现方式
       mosueType: 4,
+      // 动画时间
       time: 3
     })
 
@@ -87,6 +97,8 @@ export default defineComponent({
       state.activePoint = state.points.length - 1
 
       createPoint()
+
+      getPathPoint()
     }
 
     // 计算生成path
@@ -105,32 +117,6 @@ export default defineComponent({
         d += `${p.x} ${p.y}`
       })
       return d
-    })
-
-    // 计算cubic
-    const cubicValue = computed(() => {
-      let cubic = ''
-      // 将d 转换成为 cubic
-      const path = generatepath.value.split(' ')
-      // 匹配到的
-      const indexArray = []
-      path.forEach((item, index) => {
-        if (item.indexOf('C') !== -1) {
-          indexArray.push(index)
-        }
-      })
-      const cubicArray = []
-      indexArray.forEach(item => {
-        cubicArray.push(path.slice(item + 1, item + 5).map(Number))
-      })
-
-      cubicArray.forEach(item => {
-        cubic += `cubic-bezier(${+(item[0] / 500).toFixed(2)}, ${+((1000 - item[1]) / 500).toFixed(2)}, ${+(item[2] / 500).toFixed(2)}, ${+((1000 - item[3]) / 500).toFixed(2)})/`
-      })
-
-      cubic = cubic.substr(0, cubic.length - 1)
-
-      return cubic
     })
 
     // 处理重新绘制path
@@ -290,8 +276,6 @@ export default defineComponent({
                 const radius = getDistance({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: state.points[state.activePoint].c[0].x, y: state.points[state.activePoint].c[0].y })
                 state.points[state.activePoint].c[0].x = +((state.points[state.activePoint - 1].x - radius * Math.cos((degrees * Math.PI) / 180)).toFixed(2))
                 state.points[state.activePoint].c[0].y = +((state.points[state.activePoint - 1].y - radius * Math.sin((degrees * Math.PI) / 180)).toFixed(2))
-
-                console.log((state.points[state.activePoint - 1].y - radius * Math.sin((degrees * Math.PI) / 180)).toFixed(2))
               } else if (state.mosueType === 1) {
                 // 无手柄
                 state.points[state.activePoint].c[0].x = state.points[state.activePoint - 1].x
@@ -332,6 +316,19 @@ export default defineComponent({
       state.draggedCubic = false
     }
 
+    // 根据曲线控制坐标点, 获取该段曲线上的点的坐标
+    const getPathPoint = () => {
+      const BZ = new Bezier()
+      const pointArray = []
+
+      for (let i = 1; i < state.points.length; i++) {
+        const point = BZ.getBezierPoints(50, [state.points[i - 1].x, state.points[i - 1].y], [state.points[i].c[0].x, state.points[i].c[0].y], [state.points[i].c[1].x, state.points[i].c[1].y], [state.points[i].x, state.points[i].y])
+        pointArray.push(point)
+      }
+
+      console.log(pointArray)
+    }
+
     // 监听mouseType变化 , 如果手柄状态值为1 无手柄状态，设置当前激活点手柄值为激活点值
     watch(() => state.mosueType, (value, oldValue) => {
       if (value === 1) {
@@ -349,11 +346,15 @@ export default defineComponent({
     })
 
     onMounted(() => {
+      getPathPoint()
+
+      // 监听键盘按下抬起事件
       document.addEventListener('keydown', handleKeyDown, false)
       document.addEventListener('keyup', handleKeyUp, false)
     })
 
     onUnmounted(() => {
+      // 移除键盘按下抬起事件
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
     })
@@ -367,8 +368,8 @@ export default defineComponent({
       handlePointDragger,
       cancleDragger,
       handleSetCubic,
-      setCubicCoords,
-      cubicValue
+      setCubicCoords
+
     }
   }
 })

@@ -27,15 +27,15 @@
 
     <div class="path-content flex-col">
       <div>运动曲线</div>
-      <div class="path-box" >{{path}}</div>
+      <div class="path-box" ></div>
     </div>
 
-    <div class="effect-box" :style="FixedPath"></div>
+    <div class="effect-box" ></div>
   </div>
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, watch, computed } from 'vue'
+import { defineComponent, reactive, toRefs, watch } from 'vue'
 import control from './control.vue'
 export default defineComponent({
   components: {
@@ -49,7 +49,7 @@ export default defineComponent({
     time: Number
   },
   setup (props, { emit }) {
-    const { path, mosueType, time } = toRefs(props)
+    const { mosueType } = toRefs(props)
 
     // range
     const state = reactive({
@@ -82,24 +82,11 @@ export default defineComponent({
       }
     }
 
-    // 处理动画cubic拼接
-    const FixedPath = computed(() => {
-      let result = ''
-      path.value.split('/').map(item => {
-        result += ` all ${time.value}s ${item} ,`
-      })
-      result = ('transition:' + result)
-      result = result.slice(0, result.length - 1)
-      return result
-    })
-
     return {
       ...toRefs(state),
       handleShow,
       handleRPath,
-      handleTime,
-      path,
-      FixedPath
+      handleTime
     }
   }
 })
