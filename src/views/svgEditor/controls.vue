@@ -10,10 +10,6 @@
       </control>
       <!-- 设置时间 -->
     </div>
-    <!-- 动画执行时长 -->
-    <div class="control-box flex-row">
-      <a-input-number id="inputNumber" :value="time" @change="handleTime" :min="1" :max="10" />
-    </div>
 
     <!-- 选择手柄样式 -->
     <div class="control-box flex-row">
@@ -25,12 +21,18 @@
       </a-radio-group>
     </div>
 
-    <div class="path-content flex-col">
-      <div>运动曲线</div>
-      <div class="path-box" ></div>
+    <!-- 动画执行时长 -->
+    <div class="control-box flex-col">
+      <div>动画执行时长</div>
+      <a-input-number id="inputNumber" :value="time" @change="handleTime" :min="1" :max="10" />
     </div>
 
-    <div class="effect-box" ></div>
+    <div class="path-content flex-col">
+      <a-button type="primary">位移</a-button>
+      <div class="path-box"></div>
+    </div>
+
+    <div class="effect-box"></div>
   </div>
 </template>
 
@@ -129,7 +131,7 @@ export default defineComponent({
   margin-left: 10px;
 }
 
-.effect-box:hover {
-  transform: translateX(200px);
-}
+// .effect-box {
+//   transform: translateX(200px);
+// }
 </style>

@@ -24,7 +24,7 @@
     </div>
 
     <!-- checkbox -->
-    <div v-if="type === 'checkbox'" class="add-checkbox" style="padding: 0 10px">
+    <div v-if="type === 'checkbox'" class="add-checkbox" >
       <a-checkbox :checked="value" @change="handleCheck">{{checkboxLabel}}</a-checkbox>
     </div>
 
@@ -126,15 +126,8 @@ export default defineComponent({
 .control-item {
   margin-top: 10px;
 }
-.add-range,
-.add-text,
-.add-button,
-.add-radio {
-  padding: 0 8px;
-}
 
 .control-item-label {
   line-height: 32px;
-  padding: 0 10px;
 }
 </style>

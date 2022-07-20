@@ -73,7 +73,9 @@ export default defineComponent({
       // 当前手柄的拖动呈现方式
       mosueType: 4,
       // 动画时间
-      time: 3
+      time: 3,
+      // 曲线分割为点集合
+      pointArray: []
     })
 
     // 处理键盘按下
@@ -318,16 +320,40 @@ export default defineComponent({
 
     // 根据曲线控制坐标点, 获取该段曲线上的点的坐标
     const getPathPoint = () => {
+      // 重置pointArray
+      state.pointArray = []
       const BZ = new Bezier()
-      const pointArray = []
 
       for (let i = 1; i < state.points.length; i++) {
         const point = BZ.getBezierPoints(50, [state.points[i - 1].x, state.points[i - 1].y], [state.points[i].c[0].x, state.points[i].c[0].y], [state.points[i].c[1].x, state.points[i].c[1].y], [state.points[i].x, state.points[i].y])
-        pointArray.push(point)
+        state.pointArray.push(point)
       }
+      // 拼接
+      state.pointArray = [].concat(...state.pointArray)
 
-      console.log(pointArray)
+      // 将点处理为标准单位点
+      state.pointArray.forEach((item, index) => {
+        item[0] = +(item[0] / 500).toFixed(2)
+        item[1] = +((1000 - item[1]) / 500).toFixed(2)
+      })
+
+      // 筛选多段曲线, 位置重合值不同情况, 按照x值进行排序, 取相同x值得最大值
+      state.pointArray.sort(function (a, b) {
+        return a[0] - b[0]
+      })
+
+      state.pointArray.forEach(item => {
+
+      })
+      console.log(state.pointArray)
     }
+
+    // 根据曲线点, 生成keyframe
+    watch(() => state.pointArray, (value, oldValue) => {
+      value.forEach((el, index) => {
+      })
+      // 判断是否是平滑递增曲线， 如果是平分十个点获取对应点的值
+    }, { deep: true })
 
     // 监听mouseType变化 , 如果手柄状态值为1 无手柄状态，设置当前激活点手柄值为激活点值
     watch(() => state.mosueType, (value, oldValue) => {
@@ -386,7 +412,7 @@ export default defineComponent({
   }
 
   .control-panel {
-    width: 250px;
+    width: 300px;
     min-width: 250px;
     border: 1px solid rgb(214, 213, 213);
     min-height: 100%;
