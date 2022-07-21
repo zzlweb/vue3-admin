@@ -5,7 +5,7 @@
     </div>
 
     <div class="control-panel flex-row">
-      <controls  v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType">
+      <controls v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType">
       </controls>
     </div>
   </div>
@@ -23,7 +23,7 @@ import {
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
-import { getMirrorPoint, getAnglePoint, getDistance, Bezier } from './utils'
+import { getMirrorPoint, getAnglePoint, getDistance, Bezier, removeDuplicates } from './utils'
 
 export default defineComponent({
   components: {
@@ -75,7 +75,11 @@ export default defineComponent({
       // 动画时间
       time: 3,
       // 曲线分割为点集合
-      pointArray: []
+      pointArray: [],
+      // 输出动画
+      path: [],
+      // 运动类型
+      animateType: 'scale'
     })
 
     // 处理键盘按下
@@ -232,6 +236,8 @@ export default defineComponent({
 
       state.points[state.activePoint].c[0].x += x
       state.points[state.activePoint].c[0].y += y
+
+      getPathPoint()
     }
 
     // 拖拽手柄改变坐标
@@ -290,6 +296,8 @@ export default defineComponent({
           }
         }
       }
+
+      getPathPoint()
     }
 
     // 处理拖拽点逻辑
@@ -342,17 +350,21 @@ export default defineComponent({
         return a[0] - b[0]
       })
 
-      state.pointArray.forEach(item => {
-
-      })
-      console.log(state.pointArray)
+      state.pointArray = removeDuplicates(state.pointArray)
     }
 
     // 根据曲线点, 生成keyframe
     watch(() => state.pointArray, (value, oldValue) => {
-      value.forEach((el, index) => {
-      })
-      // 判断是否是平滑递增曲线， 如果是平分十个点获取对应点的值
+      // 根据不同的动画类型输出不同的动画
+      switch (state.type) {
+        case 'scale':
+          for (var i = 0; i < state.pointArray.lenght; i++) {
+          }
+          break
+
+        default:
+          break
+      }
     }, { deep: true })
 
     // 监听mouseType变化 , 如果手柄状态值为1 无手柄状态，设置当前激活点手柄值为激活点值

@@ -162,3 +162,37 @@ export class Bezier {
     return [x, y]
   }
 }
+
+// 二维数组去重
+export function binaryArrayDuplicate (arr) {
+  const obj = {}
+  const out = []
+  for (let index = 0; index < arr.length; index++) {
+    if (!obj[arr[index]]) {
+      out.push(arr[index])
+      obj[arr[index]] = true
+    }
+  }
+  return out
+}
+
+const floatEpsilon = Math.pow(2, -23)
+export function equal (a, b) {
+  return Math.abs(a - b) <= floatEpsilon * Math.max(Math.abs(a), Math.abs(b))
+}
+
+// 筛选符合值
+export function removeDuplicates (arr) {
+  for (let left = 0; left < arr.length; left++) {
+    for (let right = 1; right < arr.length; right++) {
+      // 如果第一个值相等并且第二个值小于前一个第二个值
+      if ((equal(arr[left][0], arr[right][0])) && (arr[left][1] <= arr[right][1])) {
+      // 将left 的值改为right的值
+        arr[left][1] = arr[right][1]
+      }
+    }
+  }
+  // 去重
+  arr = binaryArrayDuplicate(arr)
+  return arr
+}

@@ -28,7 +28,7 @@
     </div>
 
     <div class="path-content flex-col">
-      <a-button type="primary">位移</a-button>
+      <a-button type="primary">大小缩放</a-button>
       <div class="path-box"></div>
     </div>
 
