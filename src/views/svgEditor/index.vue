@@ -5,7 +5,7 @@
     </div>
 
     <div class="control-panel flex-row">
-      <controls v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType">
+      <controls v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType" :keyframePoint="keyframePoint">
       </controls>
     </div>
   </div>
@@ -23,6 +23,7 @@ import {
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
+import { throttle } from 'lodash'
 import { getMirrorPoint, getAnglePoint, getDistance, Bezier, removeDuplicates } from './utils'
 
 export default defineComponent({
@@ -77,7 +78,7 @@ export default defineComponent({
       // 曲线分割为点集合
       pointArray: [],
       // 输出动画
-      path: [],
+      keyframePoint: [],
       // 运动类型
       animateType: 'scale'
     })
@@ -104,7 +105,7 @@ export default defineComponent({
 
       createPoint()
 
-      getPathPoint()
+      throttle(() => { getPathPoint() }, 200)
     }
 
     // 计算生成path
@@ -237,7 +238,7 @@ export default defineComponent({
       state.points[state.activePoint].c[0].x += x
       state.points[state.activePoint].c[0].y += y
 
-      getPathPoint()
+      throttle(() => { getPathPoint() }, 200)
     }
 
     // 拖拽手柄改变坐标
@@ -297,7 +298,7 @@ export default defineComponent({
         }
       }
 
-      getPathPoint()
+      throttle(() => { getPathPoint() }, 200)
     }
 
     // 处理拖拽点逻辑
@@ -356,10 +357,12 @@ export default defineComponent({
     // 根据曲线点, 生成keyframe
     watch(() => state.pointArray, (value, oldValue) => {
       // 根据不同的动画类型输出不同的动画
-      switch (state.type) {
+      switch (state.animateType) {
         case 'scale':
-          for (var i = 0; i < state.pointArray.lenght; i++) {
-          }
+
+          state.keyframePoint = value.filter((item, index) => index % 10 === 0)
+          state.keyframePoint.push(value[value.length - 1])
+          console.log(state.keyframePoint)
           break
 
         default:

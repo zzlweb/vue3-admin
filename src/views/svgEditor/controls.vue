@@ -29,15 +29,17 @@
 
     <div class="path-content flex-col">
       <a-button type="primary">大小缩放</a-button>
-      <div class="path-box"></div>
+      <div class="path-box">
+        {{handleKeyframe}}
+      </div>
     </div>
 
-    <div class="effect-box"></div>
+    <div class="effect-box" :style="styleObject"></div>
   </div>
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs, watch } from 'vue'
+import { computed, defineComponent, reactive, toRefs, watch } from 'vue'
 import control from './control.vue'
 export default defineComponent({
   components: {
@@ -48,10 +50,11 @@ export default defineComponent({
     show: Boolean,
     path: String,
     mosueType: Number,
-    time: Number
+    time: Number,
+    keyframePoint: Array
   },
   setup (props, { emit }) {
-    const { mosueType } = toRefs(props)
+    const { mosueType, keyframePoint } = toRefs(props)
 
     // range
     const state = reactive({
@@ -59,6 +62,8 @@ export default defineComponent({
         height: '30px',
         display: 'flex',
         alignItems: 'center'
+      },
+      styleObject: {
       },
       value: mosueType.value
     })
@@ -84,11 +89,26 @@ export default defineComponent({
       }
     }
 
+    // 计算keyframe
+    const handleKeyframe = computed(() => {
+      const a = '@keyframes scale-animate {'
+      let b = ''
+      keyframePoint.value.forEach(it => {
+        b += `${(it[0] * 100).toFixed(2)}% {
+          transform: scale(${(1 - it[1]).toFixed(2)});
+        } `
+      })
+      const c = '}'
+
+      return a + b + c
+    })
+
     return {
       ...toRefs(state),
       handleShow,
       handleRPath,
-      handleTime
+      handleTime,
+      handleKeyframe
     }
   }
 })

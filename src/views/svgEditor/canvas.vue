@@ -180,7 +180,7 @@ svg {
 }
 
 .path {
-  stroke: #555;
+  stroke:#00a971;
   stroke-width: 3px;
   stroke-linecap: round;
   fill: none;
