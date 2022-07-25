@@ -5,7 +5,7 @@
     </div>
 
     <div class="control-panel flex-row">
-      <controls v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType" :keyframePoint="keyframePoint">
+      <controls :path="cubicValue" v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType" :keyframePoint="keyframePoint">
       </controls>
     </div>
   </div>
@@ -354,6 +354,29 @@ export default defineComponent({
       state.pointArray = removeDuplicates(state.pointArray)
     }
 
+    // 计算cubic
+    const cubicValue = computed(() => {
+      let cubic = ''
+      // 将d 转换成为 cubic
+      const path = generatepath.value.split(' ')
+      // 匹配到的
+      const indexArray = []
+      path.forEach((item, index) => {
+        if (item.indexOf('C') !== -1) {
+          indexArray.push(index)
+        }
+      })
+      const cubicArray = []
+      indexArray.forEach(item => {
+        cubicArray.push(path.slice(item + 1, item + 5).map(Number))
+      })
+      cubicArray.forEach(item => {
+        cubic += `cubic-bezier(${+(item[0] / 500).toFixed(2)}, ${+((1000 - item[1]) / 500).toFixed(2)}, ${+(item[2] / 500).toFixed(2)}, ${+((1000 - item[3]) / 500).toFixed(2)})/`
+      })
+      cubic = cubic.substr(0, cubic.length - 1)
+      return cubic
+    })
+
     // 根据曲线点, 生成keyframe
     watch(() => state.pointArray, (value, oldValue) => {
       // 根据不同的动画类型输出不同的动画
@@ -409,8 +432,8 @@ export default defineComponent({
       handlePointDragger,
       cancleDragger,
       handleSetCubic,
-      setCubicCoords
-
+      setCubicCoords,
+      cubicValue
     }
   }
 })
