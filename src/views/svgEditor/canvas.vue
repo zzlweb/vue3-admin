@@ -1,6 +1,7 @@
 <template>
   <div class="svg-dom" ref="svgDom">
     <svg :width="w" :height="h" @click="addPoints" @mousemove="handleMouseMove">
+
       <g :class="{'hidden': !show}" class="add-g">
         <!-- x -->
         <line v-for="(item, index) in Math.round(w/size)" :key="index" :x1="item*size" :y1="0 + h/3" :x2="item*size" :y2="h*2/3">
@@ -13,6 +14,18 @@
         <line :x1="0" :y1="2*h/3" :x2="w + 50" :y2="h*2/3" style="stroke-width: 2px; stroke: #000">
         </line>
         <polyline :points="`${w +10} ${h*2/3 - 30}, ${w + 50} ${h*2/3}, ${w + 10} ${h*2/3 + 30}`" style="stroke-width: 2px; stroke: #000"></polyline>
+      </g>
+
+      <!-- rect -->
+      <g v-if="Histogram && cubicNumber" style="z-index: -1 ; position: relative">
+        <defs>
+          <linearGradient id="test-linear-gradient">
+            <stop offset="0%" stop-color="#00a971" stop-opacity="0.6"></stop>
+            <stop offset="100%" stop-color="#2af598" stop-opacity="1"></stop>
+          </linearGradient>
+          <linearGradient id="right_to_left" xlink:href="#test-linear-gradient" x1="100%" y1="100%" x2="0%" y2="0%"></linearGradient>
+        </defs>
+        <rect v-for="(item, index) in keyframePoint" :key="index" :x="item[0] * 500 - 7.5" :y="calcHeight(item[1]) > 1000 ? 1000 : calcHeight(item[1])" width="15" :height="Math.abs(calcHeight(item[1]) > 1000 ?  calcHeight(item[1]) - 1000 : 1000 - calcHeight(item[1]))" rx="2" ry="2" style="fill:url(#right_to_left)"></rect>
       </g>
       <!-- path -->
       <path class="path" :d="path" id="path">
@@ -32,7 +45,7 @@
 <script>
 import { throttle } from 'lodash'
 // dom
-import { toRefs, onMounted, ref, onUnmounted } from 'vue'
+import { toRefs, onMounted, ref, onUnmounted, computed } from 'vue'
 // 二次贝塞尔曲线控制柄
 import cubic from './Cubic.vue'
 // point
@@ -52,12 +65,19 @@ export default {
     // 是否拖拽点
     draggedPoint: Boolean,
     // 是否拖拽三次贝塞尔曲线控制柄
-    draggedCubic: [Boolean, Number]
+    draggedCubic: [Boolean, Number],
+    // 获取动画点
+    keyframePoint: Array,
+    // 是否显示柱状图
+    Histogram: Boolean,
+
+    cubicNumber: Boolean
   },
   components: {
     cubic
   },
   setup (props, { emit }) {
+    // const { keyframePoint } = toRefs(props)
     const svgDom = ref(null)
     const CurrentAddPoint = ref(null)
     onMounted(() => {
@@ -128,7 +148,9 @@ export default {
         value.x < 0 ||
         value.y > (h.value * 2) / 3 ||
         value.y < h.value / 3
-      ) { return }
+      ) {
+        return
+      }
       emit('setPointValue', value)
     }
 
@@ -138,6 +160,12 @@ export default {
       emit('setCubicCoords', value)
     }
 
+    // 处理柱状图高度
+    const calcHeight = computed(() => (value) => {
+      const it = value > 0 ? 1000 - value * 500 : 1000 + -value * 500
+      return it
+    })
+
     return {
       show,
       snap,
@@ -146,7 +174,9 @@ export default {
       svgDom,
       handleMouseMove,
       handlePointDragger,
-      handleSetCubic
+      handleSetCubic,
+      // resetkeyPoint,
+      calcHeight
     }
   }
 }
@@ -180,7 +210,7 @@ svg {
 }
 
 .path {
-  stroke:#00a971;
+  stroke: #00a971;
   stroke-width: 3px;
   stroke-linecap: round;
   fill: none;

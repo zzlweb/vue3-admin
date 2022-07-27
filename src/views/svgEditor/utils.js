@@ -185,6 +185,9 @@ export function equal (a, b) {
 export function removeDuplicates (arr) {
   for (let left = 0; left < arr.length; left++) {
     for (let right = 1; right < arr.length; right++) {
+      if (arr[right][0] > 1) {
+        arr[right][0] = 1
+      }
       // 如果第一个值相等并且第二个值小于前一个第二个值
       if ((equal(arr[left][0], arr[right][0])) && (arr[left][1] <= arr[right][1])) {
       // 将left 的值改为right的值
@@ -195,4 +198,33 @@ export function removeDuplicates (arr) {
   // 去重
   arr = binaryArrayDuplicate(arr)
   return arr
+}
+
+// 从一个数组中均匀的取出10个数, 包含首尾
+export function getEvenNumber (arr, nub) {
+  if (!arr) {
+    return []
+  }
+
+  const data = []
+  // 获取首项
+  data[0] = arr[0]
+  // 获取数组长度
+  const total = arr.length
+  // 如果数组长度大于0 ，小于要获取的总数, 返回数组
+  if (total > 0 && total < nub) {
+    return arr
+  } else {
+    // 获取整数
+    const diff = Math.floor(total / (nub - 2))
+    // 赋值
+    for (let i = 1; i <= nub - 2; i++) {
+      data[i] = arr[diff * i]
+    }
+
+    // 添加尾部
+    data.push(arr[total - 1])
+
+    return data
+  }
 }

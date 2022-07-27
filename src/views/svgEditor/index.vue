@@ -1,11 +1,11 @@
 <template>
   <div class="canvas-container flex-row" @mouseup="cancleDragger" @mouseleave="cancleDragger">
     <div class="canvas flex-row fill-flex">
-      <canvas-box :w="w" :h="h" :grid="grid" :path="generatepath" :ctrl="ctrl" :points="points" @addPoint="addPoint" :activePoint="activePoint" :draggedPoint="draggedPoint" :draggedCubic="draggedCubic" @setPointValue="setPointValue" @setCubicCoords="setCubicCoords" @handlePointDragger="handlePointDragger" @handleSetCubic="handleSetCubic"></canvas-box>
+      <canvas-box :Histogram="Histogram" :cubicNumber="cubicNumber" :w="w" :h="h" :grid="grid" :keyframePoint="keyframePoint" :path="generatepath" :ctrl="ctrl" :points="points" @addPoint="addPoint" :activePoint="activePoint" :draggedPoint="draggedPoint" :draggedCubic="draggedCubic" @setPointValue="setPointValue" @setCubicCoords="setCubicCoords" @handlePointDragger="handlePointDragger" @handleSetCubic="handleSetCubic"></canvas-box>
     </div>
 
     <div class="control-panel flex-row">
-      <controls :path="cubicValue" v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType" :keyframePoint="keyframePoint">
+      <controls v-model:Histogram="Histogram" :cubicNumber="cubicNumber" :cubicPath="cubicValue" :keyframePoint="keyframePoint" v-model:time="time" v-model:show="grid.show" @handleRPath="handleRPath" :lineType="lineType" v-model:mosueType="mosueType">
       </controls>
     </div>
   </div>
@@ -23,8 +23,8 @@ import {
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
-import { throttle } from 'lodash'
-import { getMirrorPoint, getAnglePoint, getDistance, Bezier, removeDuplicates } from './utils'
+// import _ from 'lodash'
+import { getMirrorPoint, getAnglePoint, getDistance, Bezier, removeDuplicates, getEvenNumber } from './utils'
 
 export default defineComponent({
   components: {
@@ -80,7 +80,9 @@ export default defineComponent({
       // 输出动画
       keyframePoint: [],
       // 运动类型
-      animateType: 'scale'
+      animateType: 'scale',
+      // 是否显示柱状图
+      Histogram: true
     })
 
     // 处理键盘按下
@@ -91,6 +93,38 @@ export default defineComponent({
     // 处理键盘抬起
     const handleKeyUp = (e) => {
       state.ctrl = false
+    }
+
+    // 当前为一条贝塞尔曲线返回为false 否则为true
+    const cubicNumber = computed(() => {
+      return state.points.length > 2
+    })
+
+    // 根据曲线控制坐标点, 获取该段曲线上的点的坐标
+    const getPathPoint = () => {
+      // 重置pointArray
+      state.pointArray = []
+      const BZ = new Bezier()
+
+      for (let i = 1; i < state.points.length; i++) {
+        const point = BZ.getBezierPoints(100, [state.points[i - 1].x, state.points[i - 1].y], [state.points[i].c[0].x, state.points[i].c[0].y], [state.points[i].c[1].x, state.points[i].c[1].y], [state.points[i].x, state.points[i].y])
+        state.pointArray.push(point)
+      }
+      // 拼接
+      state.pointArray = [].concat(...state.pointArray)
+
+      // 将点处理为标准单位点
+      state.pointArray.forEach((item, index) => {
+        item[0] = +(item[0] / 500).toFixed(2)
+        item[1] = +((1000 - item[1]) / 500).toFixed(2)
+      })
+
+      // 筛选多段曲线, 位置重合值不同情况, 按照x值进行排序, 取相同x值得最大值
+      state.pointArray.sort(function (a, b) {
+        return a[0] - b[0]
+      })
+
+      state.pointArray = removeDuplicates(state.pointArray)
     }
 
     // 处理添加点
@@ -105,7 +139,7 @@ export default defineComponent({
 
       createPoint()
 
-      throttle(() => { getPathPoint() }, 200)
+      getPathPoint()
     }
 
     // 计算生成path
@@ -143,6 +177,7 @@ export default defineComponent({
         }
       ]
       state.activePoint = 0
+      getPathPoint()
     }
 
     // 根据不同曲线类型,变化添加的点坐标
@@ -238,7 +273,9 @@ export default defineComponent({
       state.points[state.activePoint].c[0].x += x
       state.points[state.activePoint].c[0].y += y
 
-      throttle(() => { getPathPoint() }, 200)
+      if (state.points.length > 2) {
+        getPathPoint()
+      }
     }
 
     // 拖拽手柄改变坐标
@@ -298,7 +335,9 @@ export default defineComponent({
         }
       }
 
-      throttle(() => { getPathPoint() }, 200)
+      if (state.points.length > 2) {
+        getPathPoint()
+      }
     }
 
     // 处理拖拽点逻辑
@@ -327,34 +366,7 @@ export default defineComponent({
       state.draggedCubic = false
     }
 
-    // 根据曲线控制坐标点, 获取该段曲线上的点的坐标
-    const getPathPoint = () => {
-      // 重置pointArray
-      state.pointArray = []
-      const BZ = new Bezier()
-
-      for (let i = 1; i < state.points.length; i++) {
-        const point = BZ.getBezierPoints(50, [state.points[i - 1].x, state.points[i - 1].y], [state.points[i].c[0].x, state.points[i].c[0].y], [state.points[i].c[1].x, state.points[i].c[1].y], [state.points[i].x, state.points[i].y])
-        state.pointArray.push(point)
-      }
-      // 拼接
-      state.pointArray = [].concat(...state.pointArray)
-
-      // 将点处理为标准单位点
-      state.pointArray.forEach((item, index) => {
-        item[0] = +(item[0] / 500).toFixed(2)
-        item[1] = +((1000 - item[1]) / 500).toFixed(2)
-      })
-
-      // 筛选多段曲线, 位置重合值不同情况, 按照x值进行排序, 取相同x值得最大值
-      state.pointArray.sort(function (a, b) {
-        return a[0] - b[0]
-      })
-
-      state.pointArray = removeDuplicates(state.pointArray)
-    }
-
-    // 计算cubic
+    // 在一条三次贝塞尔曲线显示cubic
     const cubicValue = computed(() => {
       let cubic = ''
       // 将d 转换成为 cubic
@@ -382,32 +394,17 @@ export default defineComponent({
       // 根据不同的动画类型输出不同的动画
       switch (state.animateType) {
         case 'scale':
+          // eslint-disable-next-line no-case-declarations
+          const arr = getEvenNumber(value, 15)
 
-          state.keyframePoint = value.filter((item, index) => index % 10 === 0)
-          state.keyframePoint.push(value[value.length - 1])
-          console.log(state.keyframePoint)
-          break
+          if (arr.some(item => !item)) {
+            return
+          }
+          state.keyframePoint = arr
 
-        default:
           break
       }
     }, { deep: true })
-
-    // 监听mouseType变化 , 如果手柄状态值为1 无手柄状态，设置当前激活点手柄值为激活点值
-    watch(() => state.mosueType, (value, oldValue) => {
-      if (value === 1) {
-        if (state.points.length >= 2) {
-          // if (!(state.activePoint - 2 === 0 && state.draggedCubic === 0) || !(state.activePoint === state.points.length && state.draggedCubic === 1)) {
-          //   // 无手柄
-          //   state.points[state.activePoint - 2].c[1].x = state.points[state.activePoint - 2].x
-          //   state.points[state.activePoint - 2].c[1].y = state.points[state.activePoint - 2].y
-
-          //   state.points[state.activePoint].c[0].x = state.points[state.activePoint - 1].x
-          //   state.points[state.activePoint].c[0].y = state.points[state.activePoint - 1].y
-          // }
-        }
-      }
-    })
 
     onMounted(() => {
       getPathPoint()
@@ -433,7 +430,8 @@ export default defineComponent({
       cancleDragger,
       handleSetCubic,
       setCubicCoords,
-      cubicValue
+      cubicValue,
+      cubicNumber
     }
   }
 })
