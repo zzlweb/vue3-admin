@@ -146,7 +146,7 @@ export default defineComponent({
       let b = ''
       keyframePoint.value.forEach((it) => {
         b += `${(it[0] * 100).toFixed(2)}% {
-          transform: scale(${(1 - it[1]).toFixed(2)});
+          transform: scale(${(it[1] + 1).toFixed(2)});
         } `
       })
       const c = '}'
@@ -238,13 +238,13 @@ export default defineComponent({
 }
 
 .effect-box {
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   background: #00a971;
   margin: 30px auto 0;
 }
 
 .effect-box.two {
-  transform: scale(0);
+  transform: scale(2);
 }
 </style>

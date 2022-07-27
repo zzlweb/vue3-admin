@@ -228,3 +228,10 @@ export function getEvenNumber (arr, nub) {
     return data
   }
 }
+
+export function throttle (method, delay, context) {
+  clearTimeout(method.timerId)
+  method.timerId = setTimeout(function () {
+    method.call(context)
+  }, delay)
+}

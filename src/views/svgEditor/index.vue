@@ -23,8 +23,7 @@ import {
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
-// import _ from 'lodash'
-import { getMirrorPoint, getAnglePoint, getDistance, Bezier, removeDuplicates, getEvenNumber } from './utils'
+import { getMirrorPoint, throttle, getAnglePoint, getDistance, Bezier, removeDuplicates, getEvenNumber } from './utils'
 
 export default defineComponent({
   components: {
@@ -115,7 +114,11 @@ export default defineComponent({
 
       // 将点处理为标准单位点
       state.pointArray.forEach((item, index) => {
-        item[0] = +(item[0] / 500).toFixed(2)
+        if (item[0] < 0) {
+          item[0] = 0
+        } else {
+          item[0] = +(item[0] / 500).toFixed(2)
+        }
         item[1] = +((1000 - item[1]) / 500).toFixed(2)
       })
 
@@ -274,7 +277,7 @@ export default defineComponent({
       state.points[state.activePoint].c[0].y += y
 
       if (state.points.length > 2) {
-        getPathPoint()
+        throttle(getPathPoint, 5, this)
       }
     }
 
@@ -336,7 +339,7 @@ export default defineComponent({
       }
 
       if (state.points.length > 2) {
-        getPathPoint()
+        throttle(getPathPoint, 5, this)
       }
     }
 
