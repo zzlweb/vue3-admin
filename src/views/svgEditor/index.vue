@@ -81,7 +81,9 @@ export default defineComponent({
       // 运动类型
       animateType: 'scale',
       // 是否显示柱状图
-      Histogram: true
+      Histogram: true,
+      // 新增点是否为拆分点
+      isSplit: false
     })
 
     // 处理键盘按下
@@ -139,10 +141,25 @@ export default defineComponent({
       state.points.splice(state.points.length - 1, 0, value)
       // 更新当前激活点下标 + 1
       state.activePoint = state.points.length - 1
-
+      // 判断是否是拆分曲线, 如果是执行拆分逻辑, 更改全局拆分点添加逻辑。
+      checkPoint(value)
+      // 新增点逻辑
       createPoint()
-
+      // 分割曲线
       getPathPoint()
+    }
+
+    // 判断点是否是在贝塞尔曲线之上, 如果是更改全局分割点状态。
+    const checkPoint = (value) => {
+      // 标准单位化当前点击点, 与现存曲线点进行匹配。
+      const Npoint = []
+
+      Npoint[0] = +(value.x / 500).toFixed(2)
+      Npoint[1] = +((1000 - value.y) / 500).toFixed(2)
+
+      console.log(Npoint)
+
+      console.log(state.pointArray)
     }
 
     // 计算生成path
@@ -211,19 +228,23 @@ export default defineComponent({
                 ]
               }
             } else {
-              points[active] = {
-                x: points[active].x,
-                y: points[active].y,
-                c: [
-                  {
-                    x: (points[active].x + points[active - 1].x) / 2,
-                    y: (points[active].y + points[active - 1].y) / 2 + 50
-                  },
-                  {
-                    x: (points[active].x + points[active - 1].x) / 2,
-                    y: (points[active].y + points[active - 1].y) / 2 - 50
-                  }
-                ]
+              if (state.isSplit) {
+
+              } else {
+                points[active] = {
+                  x: points[active].x,
+                  y: points[active].y,
+                  c: [
+                    {
+                      x: (points[active].x + points[active - 1].x) / 2,
+                      y: (points[active].y + points[active - 1].y) / 2 + 50
+                    },
+                    {
+                      x: (points[active].x + points[active - 1].x) / 2,
+                      y: (points[active].y + points[active - 1].y) / 2 - 50
+                    }
+                  ]
+                }
               }
             }
 
