@@ -209,6 +209,8 @@ export default defineComponent({
 
 <style lang="less" scoped>
 .ad-Controls {
+  height: 100%;
+  overflow-y: auto;
   width: 100%;
 
   .control-box {

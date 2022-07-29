@@ -47,6 +47,21 @@ export const constantRoutes = [{
   }
   ]
 },
+{
+  path: '/drill',
+  component: Layout,
+  redirect: '/drill/index',
+  name: '钻取图',
+  meta: {
+    title: '钻取图'
+  },
+  children: [{
+    path: 'index',
+    name: '钻取图',
+    component: () => import(/* webpackChunkName: "DrillMap" */ '@/views/DrillMap/index.vue')
+  }
+  ]
+},
 ExcelModule,
 {
   path: '/login',
