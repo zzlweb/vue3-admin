@@ -157,9 +157,12 @@ export default defineComponent({
       Npoint[0] = +(value.x / 500).toFixed(2)
       Npoint[1] = +((1000 - value.y) / 500).toFixed(2)
 
-      console.log(Npoint)
-
-      console.log(state.pointArray)
+      state.pointArray.map(item => {
+        if (item[0] >= Npoint[0]) {
+          // 判断 Y 值是否在曲线上下 30 区间
+          // Math.abs(Npoint[1] - item[1]) > 0.06 ? state.isSplit = false : state.isSplit = true
+        }
+      })
     }
 
     // 计算生成path
@@ -229,7 +232,7 @@ export default defineComponent({
               }
             } else {
               if (state.isSplit) {
-
+                return
               } else {
                 points[active] = {
                   x: points[active].x,
