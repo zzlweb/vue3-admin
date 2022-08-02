@@ -123,7 +123,7 @@ export default defineComponent({
 
       for (let i = 1; i < state.points.length; i++) {
         const point = BZ.getBezierPoints(
-          50,
+          100,
           [state.points[i - 1].x, state.points[i - 1].y],
           [state.points[i].c[0].x, state.points[i].c[0].y],
           [state.points[i].c[1].x, state.points[i].c[1].y],
@@ -158,13 +158,13 @@ export default defineComponent({
       state.lineEndMove = false
       // 判断是否是拆分曲线, 如果是执行拆分逻辑, 更改全局拆分点添加逻辑。
       value = checkPoint(value)
-      console.log(state.isSplit)
       if (state.isSplit) {
         // 如果是拆分点, 将拆分点插入到要拆分的两点之间。
         state.points.splice(state.splitIndex + 1, 0, value)
-
         // 更新当前激活点下标 + 1
         state.activePoint = state.splitIndex + 2
+        //  更改状态
+        state.isSplit = false
       } else {
         // 将点添加到倒数第二的位置
         state.points.splice(state.points.length - 1, 0, value)
@@ -190,31 +190,33 @@ export default defineComponent({
       // 问题待修复
       for (let i = 0; i < state.DupPointArray.length; i++) {
         if (
-          state.DupPointArray[i][1] >= Npoint[1] &&
-          state.DupPointArray[i][0] >= Npoint[0]
+          (Math.abs(Npoint[0] - state.DupPointArray[i][0]) <= 0.04) &&
+           (Math.abs(Npoint[1] - state.DupPointArray[i][1]) <= 0.04)
         ) {
           findIndex = i
           break
         }
       }
 
-      // 计算所添加点为第几线段
-      state.splitIndex = Math.floor(findIndex / 50)
       if (findIndex) {
+        // 计算所添加点为第几线段
+        // eslint-disable-next-line func-call-spacing
+        state.splitIndex = Math.floor(findIndex / 100)
+        state.isSplit = true
         // 判断 Y 值是否在曲线上下 30 区间
-        Math.abs(Npoint[1] - state.DupPointArray[findIndex][1]) <= 0.06 &&
-        Math.abs(Npoint[0] - state.DupPointArray[findIndex][0]) <= 0.06
-          ? (state.isSplit = true)
-          : (state.isSplit = false)
+        // eslint-disable-next-line no-unexpected-multiline
+        // (Math.abs(Npoint[1] - state.DupPointArray[findIndex][1]) <= 0.02) &&
+        // (Math.abs(Npoint[0] - state.DupPointArray[findIndex][0]) <= 0.02)
+        //   ? (state.isSplit = true)
+        //   : (state.isSplit = false)
+        // console.log(state.isSplit)
         // 如果是拆分点, 将点修改为最近曲线点, 否则返回原来点击点坐标
-        if (state.isSplit) {
-          return {
-            x: state.DupPointArray[findIndex][0] * 500,
-            y: 1000 - state.DupPointArray[findIndex][1] * 500
-          }
-        } else {
-          return value
+        return {
+          x: state.DupPointArray[findIndex][0] * 500,
+          y: 1000 - state.DupPointArray[findIndex][1] * 500
         }
+      } else {
+        return value
       }
     }
 
