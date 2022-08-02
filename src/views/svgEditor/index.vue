@@ -163,8 +163,6 @@ export default defineComponent({
         state.points.splice(state.splitIndex + 1, 0, value)
         // 更新当前激活点下标 + 1
         state.activePoint = state.splitIndex + 2
-        //  更改状态
-        state.isSplit = false
       } else {
         // 将点添加到倒数第二的位置
         state.points.splice(state.points.length - 1, 0, value)
@@ -371,6 +369,7 @@ export default defineComponent({
         }
 
         state.points = points
+        state.isSplit = false
       }
     }
 
