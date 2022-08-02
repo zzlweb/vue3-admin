@@ -23,7 +23,15 @@ import {
 } from 'vue'
 import Controls from './controls.vue'
 import CanvasBox from './canvas.vue'
-import { getMirrorPoint, throttle, getAnglePoint, getDistance, Bezier, removeDuplicates, getEvenNumber } from './utils'
+import {
+  getMirrorPoint,
+  throttle,
+  getAnglePoint,
+  getDistance,
+  Bezier,
+  removeDuplicates,
+  getEvenNumber
+} from './utils'
 
 export default defineComponent({
   components: {
@@ -60,7 +68,7 @@ export default defineComponent({
           ]
         }
       ],
-      // 当前激活点坐标
+      // 当前激活点下标
       activePoint: 0,
       // 是否拖拽点
       draggedPoint: false,
@@ -74,7 +82,11 @@ export default defineComponent({
       mosueType: 4,
       // 动画时间
       time: 3,
-      // 曲线分割为点集合
+      // 原始分割点
+      DupPointArray: [],
+      // 分割曲线下标
+      splitIndex: null,
+      // 过滤后曲线分割为点集合,
       pointArray: [],
       // 输出动画
       keyframePoint: [],
@@ -89,7 +101,9 @@ export default defineComponent({
     // 处理键盘按下
     const handleKeyDown = (e) => {
       // 判断是否点击ctrl
-      if (e.keyCode === 17 || (e.key === 'Meta' && e.keyCode === 91)) state.ctrl = true
+      if (e.keyCode === 17 || (e.key === 'Meta' && e.keyCode === 91)) {
+        state.ctrl = true
+      }
     }
     // 处理键盘抬起
     const handleKeyUp = (e) => {
@@ -108,11 +122,18 @@ export default defineComponent({
       const BZ = new Bezier()
 
       for (let i = 1; i < state.points.length; i++) {
-        const point = BZ.getBezierPoints(100, [state.points[i - 1].x, state.points[i - 1].y], [state.points[i].c[0].x, state.points[i].c[0].y], [state.points[i].c[1].x, state.points[i].c[1].y], [state.points[i].x, state.points[i].y])
+        const point = BZ.getBezierPoints(
+          50,
+          [state.points[i - 1].x, state.points[i - 1].y],
+          [state.points[i].c[0].x, state.points[i].c[0].y],
+          [state.points[i].c[1].x, state.points[i].c[1].y],
+          [state.points[i].x, state.points[i].y]
+        )
         state.pointArray.push(point)
       }
       // 拼接
       state.pointArray = [].concat(...state.pointArray)
+      state.DupPointArray = state.pointArray
 
       // 将点处理为标准单位点
       state.pointArray.forEach((item, index) => {
@@ -128,21 +149,29 @@ export default defineComponent({
       state.pointArray.sort(function (a, b) {
         return a[0] - b[0]
       })
-
       state.pointArray = removeDuplicates(state.pointArray)
     }
 
     // 处理添加点
     const addPoint = (value) => {
       if (value.y > (state.h * 2) / 3 || value.y < state.h / 3) return
-
       state.lineEndMove = false
-      // 将点添加到倒数第二的位置
-      state.points.splice(state.points.length - 1, 0, value)
-      // 更新当前激活点下标 + 1
-      state.activePoint = state.points.length - 1
       // 判断是否是拆分曲线, 如果是执行拆分逻辑, 更改全局拆分点添加逻辑。
-      checkPoint(value)
+      value = checkPoint(value)
+      console.log(state.isSplit)
+      if (state.isSplit) {
+        // 如果是拆分点, 将拆分点插入到要拆分的两点之间。
+        state.points.splice(state.splitIndex + 1, 0, value)
+
+        // 更新当前激活点下标 + 1
+        state.activePoint = state.splitIndex + 2
+      } else {
+        // 将点添加到倒数第二的位置
+        state.points.splice(state.points.length - 1, 0, value)
+        // 更新当前激活点下标 + 1
+        state.activePoint = state.points.length - 1
+      }
+
       // 新增点逻辑
       createPoint()
       // 分割曲线
@@ -156,13 +185,37 @@ export default defineComponent({
 
       Npoint[0] = +(value.x / 500).toFixed(2)
       Npoint[1] = +((1000 - value.y) / 500).toFixed(2)
+      let findIndex
 
-      state.pointArray.map(item => {
-        if (item[0] >= Npoint[0]) {
-          // 判断 Y 值是否在曲线上下 30 区间
-          // Math.abs(Npoint[1] - item[1]) > 0.06 ? state.isSplit = false : state.isSplit = true
+      // 问题待修复
+      for (let i = 0; i < state.DupPointArray.length; i++) {
+        if (
+          state.DupPointArray[i][1] >= Npoint[1] &&
+          state.DupPointArray[i][0] >= Npoint[0]
+        ) {
+          findIndex = i
+          break
         }
-      })
+      }
+
+      // 计算所添加点为第几线段
+      state.splitIndex = Math.floor(findIndex / 50)
+      if (findIndex) {
+        // 判断 Y 值是否在曲线上下 30 区间
+        Math.abs(Npoint[1] - state.DupPointArray[findIndex][1]) <= 0.06 &&
+        Math.abs(Npoint[0] - state.DupPointArray[findIndex][0]) <= 0.06
+          ? (state.isSplit = true)
+          : (state.isSplit = false)
+        // 如果是拆分点, 将点修改为最近曲线点, 否则返回原来点击点坐标
+        if (state.isSplit) {
+          return {
+            x: state.DupPointArray[findIndex][0] * 500,
+            y: 1000 - state.DupPointArray[findIndex][1] * 500
+          }
+        } else {
+          return value
+        }
+      }
     }
 
     // 计算生成path
@@ -221,7 +274,7 @@ export default defineComponent({
                 c: [
                   {
                     x: 0,
-                    y: state.h * 2 / 3
+                    y: (state.h * 2) / 3
                   },
                   // 前一个点的第一个控制点的对称点
                   {
@@ -232,7 +285,43 @@ export default defineComponent({
               }
             } else {
               if (state.isSplit) {
-                return
+                points[active] = {
+                  x: points[active].x,
+                  y: points[active].y,
+                  c: [
+                    // A 点坐标
+                    {
+                      x: (points[active - 1].x + points[active + 1].c[0].x) / 2,
+                      y: (points[active - 1].y + points[active + 1].c[0].y) / 2
+                    },
+                    // D 点坐标
+                    {
+                      x:
+                        ((points[active + 1].c[0].x +
+                          points[active + 1].c[1].x) /
+                          2 +
+                          (points[active - 1].x + points[active + 1].c[0].x) /
+                            2) /
+                        2,
+                      y:
+                        ((points[active + 1].c[0].y +
+                          points[active + 1].c[1].y) /
+                          2 +
+                          (points[active - 1].y + points[active + 1].c[0].y) /
+                            2) /
+                        2
+                    }
+                  ]
+                }
+
+                points[active + 1].c[1] = {
+                  x:
+                      (points[active + 1].x + points[active + 1].c[1].x) /
+                        2,
+                  y:
+                      (points[active + 1].y + points[active + 1].c[1].y) /
+                        2
+                }
               } else {
                 points[active] = {
                   x: points[active].x,
@@ -253,17 +342,19 @@ export default defineComponent({
 
             break
         }
-        // 求镜像坐标
+        // 求新增点手柄的镜像坐标
         points[active + 1].c[0].x = getMirrorPoint(
           { x: points[active].x, y: points[active].y },
-          { x: points[active].c[1].x, y: points[active].c[1].y }, state.w
+          { x: points[active].c[1].x, y: points[active].c[1].y },
+          state.w
         ).x
         points[active + 1].c[0].y = getMirrorPoint(
           { x: points[active].x, y: points[active].y },
-          { x: points[active].c[1].x, y: points[active].c[1].y }, state.w
+          { x: points[active].c[1].x, y: points[active].c[1].y },
+          state.w
         ).y
 
-        // 判断是否为起点
+        // 判断是否为起点，设置起点手柄
         if (points[active - 1].c) {
           points[active].c[0].x = getMirrorPoint(
             { x: points[active - 1].x, y: points[active - 1].y },
@@ -284,7 +375,10 @@ export default defineComponent({
     // 拖拽后坐标改变,  同步值到 state
     const setPointValue = (value) => {
       // 需要补充逻辑，如果为起点或终点坐标不移动
-      if (state.activePoint - 1 === 0 || state.activePoint === state.points.length) {
+      if (
+        state.activePoint - 1 === 0 ||
+        state.activePoint === state.points.length
+      ) {
         return
       }
       // 获取偏移相对值， 同步到相应的手柄
@@ -308,29 +402,74 @@ export default defineComponent({
     // 拖拽手柄改变坐标
     const setCubicCoords = (value) => {
       // 手柄坐标等于鼠标坐标
-      state.points[state.activePoint - 1].c[state.draggedCubic].x = +(value.x.toFixed(2))
-      state.points[state.activePoint - 1].c[state.draggedCubic].y = +(value.y.toFixed(2))
+      state.points[state.activePoint - 1].c[state.draggedCubic].x =
+        +value.x.toFixed(2)
+      state.points[state.activePoint - 1].c[state.draggedCubic].y =
+        +value.y.toFixed(2)
 
       // 同等改变镜像手柄的坐标值 ,排除起点坐标或者终点坐标, 并根据不同手柄类型，同步对应手柄坐标
       if (state.points.length >= 2) {
-        if (!(state.activePoint - 2 === 0 && state.draggedCubic === 0) || !(state.activePoint === state.points.length && state.draggedCubic === 1)) {
-        // 拖动点为第一个控制点
+        if (
+          !(state.activePoint - 2 === 0 && state.draggedCubic === 0) ||
+          !(
+            state.activePoint === state.points.length &&
+            state.draggedCubic === 1
+          )
+        ) {
+          // 拖动点为第一个控制点
           if (state.draggedCubic === 0) {
             if (state.points[state.activePoint - 2].c) {
               // 等长等角度
               if (state.mosueType === 4) {
-                state.points[state.activePoint - 2].c[1].x = getMirrorPoint({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: value.x, y: value.y }, state.w).x
-                state.points[state.activePoint - 2].c[1].y = getMirrorPoint({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: value.x, y: value.y }, state.w).y
+                state.points[state.activePoint - 2].c[1].x = getMirrorPoint(
+                  {
+                    x: state.points[state.activePoint - 2].x,
+                    y: state.points[state.activePoint - 2].y
+                  },
+                  { x: value.x, y: value.y },
+                  state.w
+                ).x
+                state.points[state.activePoint - 2].c[1].y = getMirrorPoint(
+                  {
+                    x: state.points[state.activePoint - 2].x,
+                    y: state.points[state.activePoint - 2].y
+                  },
+                  { x: value.x, y: value.y },
+                  state.w
+                ).y
                 // 等角度
               } else if (state.mosueType === 3) {
-                const { degrees } = getAnglePoint({ x: value.x, y: value.y }, { x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y })
-                const radius = getDistance({ x: state.points[state.activePoint - 2].x, y: state.points[state.activePoint - 2].y }, { x: state.points[state.activePoint - 2].c[1].x, y: state.points[state.activePoint - 2].c[1].y })
-                state.points[state.activePoint - 2].c[1].x = +((state.points[state.activePoint - 2].x - radius * Math.cos((degrees * Math.PI) / 180)).toFixed(2))
-                state.points[state.activePoint - 2].c[1].y = +((state.points[state.activePoint - 2].y - radius * Math.sin((degrees * Math.PI) / 180)).toFixed(2))
+                const { degrees } = getAnglePoint(
+                  { x: value.x, y: value.y },
+                  {
+                    x: state.points[state.activePoint - 2].x,
+                    y: state.points[state.activePoint - 2].y
+                  }
+                )
+                const radius = getDistance(
+                  {
+                    x: state.points[state.activePoint - 2].x,
+                    y: state.points[state.activePoint - 2].y
+                  },
+                  {
+                    x: state.points[state.activePoint - 2].c[1].x,
+                    y: state.points[state.activePoint - 2].c[1].y
+                  }
+                )
+                state.points[state.activePoint - 2].c[1].x = +(
+                  state.points[state.activePoint - 2].x -
+                  radius * Math.cos((degrees * Math.PI) / 180)
+                ).toFixed(2)
+                state.points[state.activePoint - 2].c[1].y = +(
+                  state.points[state.activePoint - 2].y -
+                  radius * Math.sin((degrees * Math.PI) / 180)
+                ).toFixed(2)
                 // 无手柄
               } else if (state.mosueType === 1) {
-                state.points[state.activePoint - 2].c[1].x = state.points[state.activePoint - 2].x
-                state.points[state.activePoint - 2].c[1].y = state.points[state.activePoint - 2].y
+                state.points[state.activePoint - 2].c[1].x =
+                  state.points[state.activePoint - 2].x
+                state.points[state.activePoint - 2].c[1].y =
+                  state.points[state.activePoint - 2].y
                 // 不等长不等角度
               } else {
                 state.mosueType = 2
@@ -341,18 +480,55 @@ export default defineComponent({
             if (state.points[state.activePoint]) {
               // 等长等角度
               if (state.mosueType === 4) {
-                state.points[state.activePoint].c[0].x = getMirrorPoint({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: value.x, y: value.y }, state.w).x
-                state.points[state.activePoint].c[0].y = getMirrorPoint({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: value.x, y: value.y }, state.w).y
+                state.points[state.activePoint].c[0].x = getMirrorPoint(
+                  {
+                    x: state.points[state.activePoint - 1].x,
+                    y: state.points[state.activePoint - 1].y
+                  },
+                  { x: value.x, y: value.y },
+                  state.w
+                ).x
+                state.points[state.activePoint].c[0].y = getMirrorPoint(
+                  {
+                    x: state.points[state.activePoint - 1].x,
+                    y: state.points[state.activePoint - 1].y
+                  },
+                  { x: value.x, y: value.y },
+                  state.w
+                ).y
               } else if (state.mosueType === 3) {
                 // 等角度
-                const { degrees } = getAnglePoint({ x: value.x, y: value.y }, { x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y })
-                const radius = getDistance({ x: state.points[state.activePoint - 1].x, y: state.points[state.activePoint - 1].y }, { x: state.points[state.activePoint].c[0].x, y: state.points[state.activePoint].c[0].y })
-                state.points[state.activePoint].c[0].x = +((state.points[state.activePoint - 1].x - radius * Math.cos((degrees * Math.PI) / 180)).toFixed(2))
-                state.points[state.activePoint].c[0].y = +((state.points[state.activePoint - 1].y - radius * Math.sin((degrees * Math.PI) / 180)).toFixed(2))
+                const { degrees } = getAnglePoint(
+                  { x: value.x, y: value.y },
+                  {
+                    x: state.points[state.activePoint - 1].x,
+                    y: state.points[state.activePoint - 1].y
+                  }
+                )
+                const radius = getDistance(
+                  {
+                    x: state.points[state.activePoint - 1].x,
+                    y: state.points[state.activePoint - 1].y
+                  },
+                  {
+                    x: state.points[state.activePoint].c[0].x,
+                    y: state.points[state.activePoint].c[0].y
+                  }
+                )
+                state.points[state.activePoint].c[0].x = +(
+                  state.points[state.activePoint - 1].x -
+                  radius * Math.cos((degrees * Math.PI) / 180)
+                ).toFixed(2)
+                state.points[state.activePoint].c[0].y = +(
+                  state.points[state.activePoint - 1].y -
+                  radius * Math.sin((degrees * Math.PI) / 180)
+                ).toFixed(2)
               } else if (state.mosueType === 1) {
                 // 无手柄
-                state.points[state.activePoint].c[0].x = state.points[state.activePoint - 1].x
-                state.points[state.activePoint].c[0].y = state.points[state.activePoint - 1].y
+                state.points[state.activePoint].c[0].x =
+                  state.points[state.activePoint - 1].x
+                state.points[state.activePoint].c[0].y =
+                  state.points[state.activePoint - 1].y
               } else {
                 // 不等长不等角度
                 state.mosueType = 2
@@ -406,32 +582,42 @@ export default defineComponent({
         }
       })
       const cubicArray = []
-      indexArray.forEach(item => {
+      indexArray.forEach((item) => {
         cubicArray.push(path.slice(item + 1, item + 5).map(Number))
       })
-      cubicArray.forEach(item => {
-        cubic += `cubic-bezier(${+(item[0] / 500).toFixed(2)}, ${+((1000 - item[1]) / 500).toFixed(2)}, ${+(item[2] / 500).toFixed(2)}, ${+((1000 - item[3]) / 500).toFixed(2)})/`
+      cubicArray.forEach((item) => {
+        cubic += `cubic-bezier(${+(item[0] / 500).toFixed(2)}, ${+(
+          (1000 - item[1]) /
+          500
+        ).toFixed(2)}, ${+(item[2] / 500).toFixed(2)}, ${+(
+          (1000 - item[3]) /
+          500
+        ).toFixed(2)})/`
       })
       cubic = cubic.substr(0, cubic.length - 1)
       return cubic
     })
 
     // 根据曲线点, 生成keyframe
-    watch(() => state.pointArray, (value, oldValue) => {
-      // 根据不同的动画类型输出不同的动画
-      switch (state.animateType) {
-        case 'scale':
-          // eslint-disable-next-line no-case-declarations
-          const arr = getEvenNumber(value, 15)
+    watch(
+      () => state.pointArray,
+      (value, oldValue) => {
+        // 根据不同的动画类型输出不同的动画
+        switch (state.animateType) {
+          case 'scale':
+            // eslint-disable-next-line no-case-declarations
+            const arr = getEvenNumber(value, 15)
 
-          if (arr.some(item => !item)) {
-            return
-          }
-          state.keyframePoint = arr
+            if (arr.some((item) => !item)) {
+              return
+            }
+            state.keyframePoint = arr
 
-          break
-      }
-    }, { deep: true })
+            break
+        }
+      },
+      { deep: true }
+    )
 
     onMounted(() => {
       getPathPoint()
