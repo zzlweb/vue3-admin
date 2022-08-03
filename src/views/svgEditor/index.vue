@@ -93,7 +93,7 @@ export default defineComponent({
       // 运动类型
       animateType: 'scale',
       // 是否显示柱状图
-      Histogram: true,
+      Histogram: false,
       // 新增点是否为拆分点
       isSplit: false
     })
@@ -396,7 +396,7 @@ export default defineComponent({
       state.points[state.activePoint].c[0].y += y
 
       if (state.points.length > 2) {
-        throttle(getPathPoint, 5, this)
+        throttle(getPathPoint, 200, this)
       }
     }
 
@@ -540,7 +540,7 @@ export default defineComponent({
       }
 
       if (state.points.length > 2) {
-        throttle(getPathPoint, 5, this)
+        throttle(getPathPoint, 200, this)
       }
     }
 
